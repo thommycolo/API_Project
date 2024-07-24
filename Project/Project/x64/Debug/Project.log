@@ -1,0 +1,3 @@
+﻿  main.c
+C:\Users\thomm\Desktop\API_Project\Project\Project\main.c(111,9): warning C4101: 'ing_tmp': variabile locale senza riferimenti
+  Project.vcxproj -> C:\Users\thomm\Desktop\API_Project\Project\x64\Debug\Project.exe
