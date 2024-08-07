@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+<<<<<<< HEAD
+    <LocalDebuggerCommandArguments>&lt;input.txt</LocalDebuggerCommandArguments>
+=======
+    <LocalDebuggerCommandArguments>&lt; C:\Users\thomm\Desktop\API_Project\Project\input.txt;&gt; C:\Users\thomm\Desktop\API_Project\Project\output.txt</LocalDebuggerCommandArguments>
+>>>>>>> b6a0d8d0889f5447972896d9b8131edc2d0300ca
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
+</Project>

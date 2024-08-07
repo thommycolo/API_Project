@@ -1,3 +1,15 @@
 ﻿  main.c
-C:\Users\thomm\Desktop\API_Project\Project\Project\main.c(111,9): warning C4101: 'ing_tmp': variabile locale senza riferimenti
-  Project.vcxproj -> C:\Users\thomm\Desktop\API_Project\Project\x64\Debug\Project.exe
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(68,6): warning C4101: 'quantity': unreferenced local variable
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(78,25): warning C4047: 'function': 'const char *' differs in levels of indirection from 'char **'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(78,25): warning C4024: 'strcpy': different types for formal and actual parameter 2
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(87,18): warning C4474: 'scanf' : too many arguments passed for format string
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(105,14): warning C4047: 'function': 'const char *' differs in levels of indirection from 'char **'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(105,14): warning C4024: 'strcmp': different types for formal and actual parameter 1
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(157,16): warning C4047: 'function': 'char **' differs in levels of indirection from 'char [256]'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(157,16): warning C4024: 'Add_recipe': different types for formal and actual parameter 1
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(163,21): warning C4047: 'function': 'char **' differs in levels of indirection from 'char [256]'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(163,21): warning C4024: 'Find_recipe': different types for formal and actual parameter 1
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(164,17): warning C4047: 'function': 'char **' differs in levels of indirection from 'char [256]'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(164,17): warning C4024: 'Add_recipe': different types for formal and actual parameter 1
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(154,9): warning C4101: 'ing_tmp': unreferenced local variable
+  Project.vcxproj -> C:\Users\thomm\Desktop\Project\API_Project\Project\x64\Debug\Project.exe

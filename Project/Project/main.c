@@ -1,35 +1,15 @@
 #include <stdio.h>
-<<<<<<< HEAD
 #include <stdlib.h>
 #include <string.h>
-
-
-
-int main() {
-
-	int clock_corr, dim_corr;
-
-	scanf(" %d %d ", &clock_corr, &dim_corr);
-	
-
-<<<<<<< HEAD
-
-=======
-<<<<<<< Updated upstream
-int maiun() {
-=======
-#include<stdlib.h>
-#include<string.h>
+#include <stdbool.h>
 
 //Globar variable
 
 #define LEN 256
 
+
 //structure declaring
-typedef struct {
-	char key[LEN];
-	int value;
-}MENU;
+
 
 typedef struct ing_node {
 	char name[LEN];
@@ -43,9 +23,17 @@ typedef struct rec_node{
 	struct rec_node*next;
 }RECIPE;
 
+//def of the recipes list
+INGREDIENT* ing_head = NULL;
+INGREDIENT* new_ing = NULL;
+
+RECIPE* rec_head = NULL;
+RECIPE* recipes = NULL;
+
+
 // Function declaring
 
-int New_line(char word[LEN]) {
+/*int New_line(char word[LEN]) {
 	int tmp = 1;
 	if (strcmp(word, "aggiungi_ricetta") == 0 || strcmp(word, "rimuovi_ricetta") == 0 || strcmp(word, "rifornimento") == 0 || strcmp(word, "ordine") == 0)
 		tmp=0;
@@ -53,107 +41,177 @@ int New_line(char word[LEN]) {
 		tmp=1;
 	printf("DIO\n");
 	return tmp;
-}
+}*/
+
 
 INGREDIENT Add_ingredient() {
 	INGREDIENT* head = NULL;
 	INGREDIENT* new_ingredient = NULL;
 	char new_ing[LEN] ="";
-	
-	do{
-		scanf("%s", new_ing);
+	new_ingredient = malloc(sizeof(INGREDIENT));
+
+	scanf("%s", &new_ing);
+	//printf("%s", new_ing);
+	/*while(strcmp(new_ing,"aggiungi_ricetta")!=0 || strcmp(new_ing, "rimuovi_ricetta") != 0 || strcmp(new_ing, "ordine") != 0 || strcmp(new_ing, "rifornimento") != 0){
+	//while(scanf("%s",&new_ing)!='\n'){
+		//scanf("%s", new_ing);
 		new_ingredient = malloc(sizeof(INGREDIENT));
-		scanf("%d",&new_ingredient->quantity);
 		strcpy(new_ingredient->name, new_ing);
+
+		scanf("%d",&new_ingredient->quantity);
 		new_ingredient->next = head;
 		head = new_ingredient;
+		printf("%s %d\n",new_ingredient->name,new_ingredient->quantity);
 		//printf("%d\n",New_line(new_ing));
-	} while (New_line(new_ing) > 0);
+	}
+	*/
+	int quantity;
+	//strcpy(new_ingredient->name, new_ing);
 	
-		return *head;
+	return *head;
 }
 
 
+void Add_recipe(char *new_recipe[LEN]){
+	
+		recipes = malloc(sizeof(RECIPE));
+		strcpy(recipes->name, new_recipe);
+		//printf("%s\n", new_recipe);
+		char new_ing[LEN];
+		int quantity=0;
+		char tmp[LEN];
+		printf("BEBBO");
+		scanf("%s %d", new_ing, &quantity);
+		scanf("%s %d", new_ing, &quantity);
+		scanf("%s %d", new_ing, &quantity);
+		scanf("[^\n]", tmp);
+		printf("%s", tmp);
+		printf("BEBBO");
+		//printf("%s %d\n", new_ing, quantity);
+
+
+		//recipes->ingredient = Add_ingredient();
+		recipes->next = rec_head;
+		rec_head = recipes;
+	
+	}
+
+bool Find_recipe(char *new_recipe[LEN]) {
+
+	bool find = false;
+
+	while (recipes->next != NULL) {
+
+		if (strcmp(new_recipe, recipes->name) == 0) {
+			printf("ricetta gia' nota\n");
+			find = true;
+			break;
+		}
+		else
+			find = false;
+
+	}
+	return find;
+}
+
+	
 
 
 
-
->>>>>>> b6a0d8d0889f5447972896d9b8131edc2d0300ca
 
 int main()
 {
 	//def of the delivery truck
 	int delivery_clock=0;
 	int delivery_dim=0;
-	//scanf(" %d %d ", &corr_clock, &corr_dim);
-
-<<<<<<< HEAD
->>>>>>> Stashed changes
->>>>>>> 17d1bb78490f8723b6d14f476ff16908e6c58f60
-=======
+	
+	scanf(" %d %d ", &delivery_clock, &delivery_dim);
+	printf(" %d %d \n", delivery_clock, delivery_dim);
 	// def of the switch
 	char key_menu[LEN];
-	int choice=0;
 
-	MENU menu[4];
-	for (int i=0; i>4;i++)
-		menu[i].value = i;
-	int clock = 0;
 
-	//def of the recipes list
-	INGREDIENT* ing_head = NULL;
-	INGREDIENT* new_ing = NULL;
-
-	RECIPE* rec_head = NULL;
-	RECIPE* recipes = NULL;
 
 	int cclock = 0;
-	
+	char new_recipe[LEN];
+
 	while (scanf("%s ", &key_menu) != EOF)
 	{
-		//printf("%s", key_menu);
-
+		
 		//chosing the option and considering the delivery
-		if (cclock != delivery_clock) {
+		if (cclock == delivery_clock) {
 			//delivery
-			clock = 0;
-		}
-		else {
-			for (int i = 0; i > 4;i++)
-			{
-				if (strcmp(key_menu, menu[i].key) == 0)
-					choice = menu[i].value;
-			}
+			cclock = 0;
 		}
 
-		char new_recipe[256];
 
-		switch (choice)
+		else if (strcmp(key_menu, "aggiungi_ricetta") == 0)      // aggiungi ricetta
 		{
-		case(0):// aggiungi ricetta
+			
+
 			scanf("%s", &new_recipe);
+			
 			char ing_tmp[LEN];
 			int quant_tmp = 0;
 			if (rec_head == NULL) {
-				recipes = malloc(sizeof(RECIPE));
-				strcpy(recipes->name, new_recipe);
-				recipes->ingredient = Add_ingredient();
-
-				break;
-		case(1):// rimuovi ricetta
-			break;
-		case(2):// rifornimento
-			break;
-		case(3):// ordine
-			break;
-		case(4):// corriere
-			break;
+				Add_recipe(new_recipe);
+				printf(" aggiunta\n");
+				//printf("%s %s %d", recipes-> new_recipe, recipes->ingredient->name,recipes->ingredient->quantity);
 			}
+			else {
 
+				if (Find_recipe(new_recipe) == false) {
+					Add_recipe(new_recipe);
+					printf(" aggiunta\n");
+				}
+				else
+					printf("ignorato\n");
+
+			}
+		}
+		else if (strcmp(key_menu, "rimuovi_ricetta") == 0) 
+		{
+			// rimuovi ricetta
+
+			bool find = false;
+			char str[LEN];
+
+			scanf("%s", &new_recipe);
+
+			if (strcmp(rec_head->name, str) == 0) 
+				rec_head = rec_head->next;
+			else {
+				while (recipes->next != NULL) {
+
+					if (strcmp(new_recipe, recipes->next->name) == 0) {
+						printf("ricetta eliminata\n");
+						recipes->next = recipes->next->next;
+							find = true;
+						break;
+					}
+					if (find == false)
+						printf("ricetta non presente\n");
+				}
+			}
+			
+		}
+		else if (strcmp(key_menu, "rifornimento") == 0) 
+		{
+			// rifornimento
 
 		}
-		cclock++;
+		else if (strcmp(key_menu, "ordine") == 0) 
+		{
+			// ordine
+
+		}
+
+		//increasing the clock
+			cclock++;
+		
 	}
-		return 0;
->>>>>>> b6a0d8d0889f5447972896d9b8131edc2d0300ca
+	
+	printf("out\n");
+	return 0;
+		
 }
