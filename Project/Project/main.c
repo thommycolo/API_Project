@@ -63,7 +63,7 @@ int main() {
 	int cclock = 0; // is the real clock
 
 	char buffer[BLEN];
-	char* cutter;
+	
 
 	char key_menu[LEN];
 
@@ -78,36 +78,32 @@ int main() {
 		}
 
 
-
-		printf("%s \n", buffer);
-
 		sscanf(buffer, "%s", key_menu);
 
+		char* cut_menu;
 		//cutting the command
-		cutter = strstr(buffer, key_menu);
-		if (cutter != NULL)
-			cutter += strlen(key_menu) + 1;
+		cut_menu = strstr(buffer , key_menu);
 
-		strcpy(buffer, cutter);
+		if (cut_menu != NULL) {
+			cut_menu += strlen(key_menu) + 1;
+		}
+		printf("%s\n", key_menu);
 
-		//printf("%s \n", buffer);
 
 
 		if (strcmp(key_menu, "aggiungi_ricetta") == 0)      // aggiungi ricetta
 		{
 			
 			char name[LEN];
-			char* tmp;
-			sscanf(buffer, "%s", name);
-
-			cutter = strstr(buffer, name);
-			if (cutter != NULL)
-				cutter += strlen(name) + 1;
-
-			strcpy(buffer, cutter);
-
+			char* cut_ing;
+			sscanf(cut_menu, "%s", name);
+			printf("%s\n", name);
+			cut_ing = strstr(buffer, name);
+			if (cut_ing != NULL) {
+				cut_ing += strlen(name)+1;
+				
+			}
 		
-			printf("%s \n", buffer);
 			if (Find(name, rec_head) == true)
 				printf("ignorato\n");
 			else {
