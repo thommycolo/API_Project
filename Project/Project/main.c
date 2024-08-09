@@ -6,10 +6,10 @@
 //Globar variable
 
 #define LEN 256
-
+#define BLEN 100000
 
 //structure declaring
-
+//def of the recipes list
 
 typedef struct ing_node {
 	char name[LEN];
@@ -17,125 +17,58 @@ typedef struct ing_node {
 	struct ing_node*next;
 }INGREDIENT;
 
-typedef struct rec_node{
+typedef struct rec_node {
 	char name[LEN];
-	INGREDIENT ingredient;
+	INGREDIENT* ingredient;
 	struct rec_node*next;
 }RECIPE;
 
-//def of the recipes list
-INGREDIENT* ing_head = NULL;
-INGREDIENT* new_ing = NULL;
-
-RECIPE* rec_head = NULL;
-RECIPE* recipes = NULL;
 
 
 // Function declaring
 
-/*int New_line(char word[LEN]) {
-	int tmp = 1;
-	if (strcmp(word, "aggiungi_ricetta") == 0 || strcmp(word, "rimuovi_ricetta") == 0 || strcmp(word, "rifornimento") == 0 || strcmp(word, "ordine") == 0)
-		tmp=0;
-	else
-		tmp=1;
-	printf("DIO\n");
-	return tmp;
-}*/
-
-
-INGREDIENT Add_ingredient() {
-	INGREDIENT* head = NULL;
-	INGREDIENT* new_ingredient = NULL;
-	char new_ing[LEN] ="";
-	new_ingredient = malloc(sizeof(INGREDIENT));
-
-	scanf("%s", &new_ing);
-	//printf("%s", new_ing);
-	/*while(strcmp(new_ing,"aggiungi_ricetta")!=0 || strcmp(new_ing, "rimuovi_ricetta") != 0 || strcmp(new_ing, "ordine") != 0 || strcmp(new_ing, "rifornimento") != 0){
-	//while(scanf("%s",&new_ing)!='\n'){
-		//scanf("%s", new_ing);
-		new_ingredient = malloc(sizeof(INGREDIENT));
-		strcpy(new_ingredient->name, new_ing);
-
-		scanf("%d",&new_ingredient->quantity);
-		new_ingredient->next = head;
-		head = new_ingredient;
-		printf("%s %d\n",new_ingredient->name,new_ingredient->quantity);
-		//printf("%d\n",New_line(new_ing));
-	}
-	*/
-	int quantity;
-	//strcpy(new_ingredient->name, new_ing);
-	
-	return *head;
-}
-
-
-void Add_recipe(char *new_recipe[LEN]){
-	
-		recipes = malloc(sizeof(RECIPE));
-		strcpy(recipes->name, new_recipe);
-		//printf("%s\n", new_recipe);
-		char new_ing[LEN];
-		int quantity=0;
-		char tmp[LEN];
-		printf("BEBBO");
-		scanf("%s %d", new_ing, &quantity);
-		scanf("%s %d", new_ing, &quantity);
-		scanf("%s %d", new_ing, &quantity);
-		scanf("[^\n]", tmp);
-		printf("%s", tmp);
-		printf("BEBBO");
-		//printf("%s %d\n", new_ing, quantity);
-
-
-		//recipes->ingredient = Add_ingredient();
-		recipes->next = rec_head;
-		rec_head = recipes;
-	
-	}
-
-bool Find_recipe(char *new_recipe[LEN]) {
-
+bool Find(char* name[LEN], RECIPE* pointer) {
 	bool find = false;
 
-	while (recipes->next != NULL) {
+	while (pointer != NULL) {
 
-		if (strcmp(new_recipe, recipes->name) == 0) {
-			printf("ricetta gia' nota\n");
+		if (strcmp(pointer->name, name) == 0)
+		{
 			find = true;
 			break;
 		}
-		else
-			find = false;
-
+		pointer = pointer->next;
 	}
+
 	return find;
 }
 
+
+
+int main() {
 	
+	// recipes list
+	RECIPE* rec_head = NULL;
+	RECIPE* new_recipe = NULL;
 
 
-
-
-int main()
-{
 	//def of the delivery truck
-	int delivery_clock=0;
-	int delivery_dim=0;
-	
+
+	int delivery_clock = 0;
+	int delivery_dim = 0;
+
 	scanf(" %d %d ", &delivery_clock, &delivery_dim);
 	printf(" %d %d \n", delivery_clock, delivery_dim);
-	// def of the switch
+
+	int cclock = 0; // is the real clock
+
+	char buffer[BLEN];
+	char* cutter;
+
 	char key_menu[LEN];
 
 
-
-	int cclock = 0;
-	char new_recipe[LEN];
-
-	while (scanf("%s ", &key_menu) != EOF)
+	while ( gets(buffer) != EOF)
 	{
 		
 		//chosing the option and considering the delivery
@@ -145,73 +78,78 @@ int main()
 		}
 
 
-		else if (strcmp(key_menu, "aggiungi_ricetta") == 0)      // aggiungi ricetta
+
+		printf("%s \n", buffer);
+
+		sscanf(buffer, "%s", key_menu);
+
+		//cutting the command
+		cutter = strstr(buffer, key_menu);
+		if (cutter != NULL)
+			cutter += strlen(key_menu) + 1;
+
+		strcpy(buffer, cutter);
+
+		//printf("%s \n", buffer);
+
+
+		if (strcmp(key_menu, "aggiungi_ricetta") == 0)      // aggiungi ricetta
 		{
 			
+			char name[LEN];
+			char* tmp;
+			sscanf(buffer, "%s", name);
 
-			scanf("%s", &new_recipe);
-			
-			char ing_tmp[LEN];
-			int quant_tmp = 0;
-			if (rec_head == NULL) {
-				Add_recipe(new_recipe);
-				printf(" aggiunta\n");
-				//printf("%s %s %d", recipes-> new_recipe, recipes->ingredient->name,recipes->ingredient->quantity);
-			}
-			else {
+			cutter = strstr(buffer, name);
+			if (cutter != NULL)
+				cutter += strlen(name) + 1;
 
-				if (Find_recipe(new_recipe) == false) {
-					Add_recipe(new_recipe);
-					printf(" aggiunta\n");
-				}
-				else
-					printf("ignorato\n");
+			strcpy(buffer, cutter);
 
-			}
-		}
-		else if (strcmp(key_menu, "rimuovi_ricetta") == 0) 
-		{
-			// rimuovi ricetta
-
-			bool find = false;
-			char str[LEN];
-
-			scanf("%s", &new_recipe);
-
-			if (strcmp(rec_head->name, str) == 0) 
-				rec_head = rec_head->next;
-			else {
-				while (recipes->next != NULL) {
-
-					if (strcmp(new_recipe, recipes->next->name) == 0) {
-						printf("ricetta eliminata\n");
-						recipes->next = recipes->next->next;
-							find = true;
-						break;
-					}
-					if (find == false)
-						printf("ricetta non presente\n");
-				}
-			}
-			
-		}
-		else if (strcmp(key_menu, "rifornimento") == 0) 
-		{
-			// rifornimento
-
-		}
-		else if (strcmp(key_menu, "ordine") == 0) 
-		{
-			// ordine
-
-		}
-
-		//increasing the clock
-			cclock++;
 		
+			printf("%s \n", buffer);
+			if (Find(name, rec_head) == true)
+				printf("ignorato\n");
+			else {
+				INGREDIENT* ing_head = NULL;
+				INGREDIENT* new_ing = NULL;
+				;
+				char ing[LEN];
+				int qty = 0;
+
+				new_recipe = malloc(sizeof(RECIPE));
+				strcpy(new_recipe->name, name);
+				
+				while (buffer != NULL)
+				{
+					sscanf(buffer, "%s %d %s", ing, qty, buffer);
+					//printf("%s\n", buffer);
+					new_ing = malloc(sizeof(INGREDIENT));
+					strcpy(new_ing->name, ing);
+					new_ing->quantity = qty;
+					new_ing->next = ing_head;
+					ing_head = new_ing;
+				}
+				new_recipe->ingredient = ing_head;
+				new_recipe->next = rec_head;
+				rec_head = new_recipe;
+
+				printf("accettato\n");
+			}
+		}
+		else if (strcmp(key_menu, "rimuovi_ricetta") == 0)	// rimuovi ricetta
+		{
+		}
+		else if (strcmp(key_menu, "rifornimento") == 0)		// rifornimento
+		{
+		}
+		else if (strcmp(key_menu, "ordine") == 0)			// ordine
+		{
+		}
+
+		cclock++;
 	}
-	
-	printf("out\n");
+
+
 	return 0;
-		
 }
