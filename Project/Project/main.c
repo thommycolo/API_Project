@@ -43,6 +43,14 @@ bool Find(char* name[LEN], RECIPE* pointer) {
 	return find;
 }
 
+int Contacifre(int n) {
+	int count = 0;
+	while (n > 0) {
+		n /= 10;
+		count++;
+	}
+	return count;
+}
 
 
 int main() {
@@ -84,47 +92,52 @@ int main() {
 		//cutting the command
 		cut_menu = strstr(buffer , key_menu);
 
-		if (cut_menu != NULL) {
+		if (cut_menu != '\0') {
 			cut_menu += strlen(key_menu) + 1;
 		}
 		printf("%s\n", key_menu);
 
-
+		//free(cut_menu);
 
 		if (strcmp(key_menu, "aggiungi_ricetta") == 0)      // aggiungi ricetta
 		{
 			
 			char name[LEN];
-			char* cut_ing;
+			char* cut_rec;
 			sscanf(cut_menu, "%s", name);
-			printf("%s\n", name);
-			cut_ing = strstr(buffer, name);
-			if (cut_ing != NULL) {
-				cut_ing += strlen(name)+1;
-				
+			printf(" %s\n", name);
+
+			cut_rec = strstr(cut_menu, name);
+			if (cut_rec != NULL) {
+				cut_rec += strlen(name) + 1;	
 			}
-		
+			printf("%s\n", cut_rec);
 			if (Find(name, rec_head) == true)
 				printf("ignorato\n");
 			else {
 				INGREDIENT* ing_head = NULL;
 				INGREDIENT* new_ing = NULL;
-				;
-				char ing[LEN];
-				int qty = 0;
+
+				//char ing[LEN];
+				//int qty = 0;
 
 				new_recipe = malloc(sizeof(RECIPE));
 				strcpy(new_recipe->name, name);
 				
-				while (buffer != NULL)
+				while (cut_rec != '\0')
 				{
-					sscanf(buffer, "%s %d %s", ing, qty, buffer);
-					//printf("%s\n", buffer);
+					printf("%s\n", new_ing);
 					new_ing = malloc(sizeof(INGREDIENT));
-					strcpy(new_ing->name, ing);
-					new_ing->quantity = qty;
+					sscanf(cut_rec, "%s %d", new_ing->name, new_ing->quantity);
+					//printf("%s\n", buffer);					
 					new_ing->next = ing_head;
 					ing_head = new_ing;
+
+					if (cut_rec != '\0') {
+						cut_rec += strlen(new_ing->name) + 1 + Contacifre(new_ing->quantity);
+						if (cut_rec[0] == ' ')
+							cut_rec++;
+					}
 				}
 				new_recipe->ingredient = ing_head;
 				new_recipe->next = rec_head;

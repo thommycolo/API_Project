@@ -1,8 +1,9 @@
 ﻿  main.c
 C:\Users\thomm\Desktop\API_Project\Project\Project\main.c(35,29): warning C4047: 'funzione': 'const char *' differisce da 'char **' nei livelli di riferimento indiretto
 C:\Users\thomm\Desktop\API_Project\Project\Project\main.c(35,29): warning C4024: 'strcmp': tipi diversi tra il parametro 2 formale e quello effettivo
-C:\Users\thomm\Desktop\API_Project\Project\Project\main.c(71,10): warning C4013: 'gets' non definita. Verrà considerata come esterna che restituisce un int.
-C:\Users\thomm\Desktop\API_Project\Project\Project\main.c(107,13): warning C4047: 'funzione': 'char **' differisce da 'char [256]' nei livelli di riferimento indiretto
-C:\Users\thomm\Desktop\API_Project\Project\Project\main.c(107,13): warning C4024: 'Find': tipi diversi tra il parametro 1 formale e quello effettivo
-C:\Users\thomm\Desktop\API_Project\Project\Project\main.c(121,21): warning C4477: 'sscanf': con la stringa di formato '%d' è necessario un argomento di tipo 'int *', ma il tipo dell'argomento variadic 2 è 'int'
+C:\Users\thomm\Desktop\API_Project\Project\Project\main.c(79,10): warning C4013: 'gets' non definita. Verrà considerata come esterna che restituisce un int.
+C:\Users\thomm\Desktop\API_Project\Project\Project\main.c(115,13): warning C4047: 'funzione': 'char **' differisce da 'char [256]' nei livelli di riferimento indiretto
+C:\Users\thomm\Desktop\API_Project\Project\Project\main.c(115,13): warning C4024: 'Find': tipi diversi tra il parametro 1 formale e quello effettivo
+C:\Users\thomm\Desktop\API_Project\Project\Project\main.c(129,13): warning C4477: 'printf': con la stringa di formato '%s' è necessario un argomento di tipo 'char *', ma il tipo dell'argomento variadic 1 è 'INGREDIENT *'
+C:\Users\thomm\Desktop\API_Project\Project\Project\main.c(131,22): warning C4477: 'sscanf': con la stringa di formato '%d' è necessario un argomento di tipo 'int *', ma il tipo dell'argomento variadic 2 è 'int'
   Project.vcxproj -> C:\Users\thomm\Desktop\API_Project\Project\x64\Debug\Project.exe
