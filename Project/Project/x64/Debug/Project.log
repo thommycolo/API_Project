@@ -1,9 +1,14 @@
 ﻿  main.c
-C:\Users\thomm\Desktop\API_Project\Project\Project\main.c(35,29): warning C4047: 'funzione': 'const char *' differisce da 'char **' nei livelli di riferimento indiretto
-C:\Users\thomm\Desktop\API_Project\Project\Project\main.c(35,29): warning C4024: 'strcmp': tipi diversi tra il parametro 2 formale e quello effettivo
-C:\Users\thomm\Desktop\API_Project\Project\Project\main.c(79,10): warning C4013: 'gets' non definita. Verrà considerata come esterna che restituisce un int.
-C:\Users\thomm\Desktop\API_Project\Project\Project\main.c(115,13): warning C4047: 'funzione': 'char **' differisce da 'char [256]' nei livelli di riferimento indiretto
-C:\Users\thomm\Desktop\API_Project\Project\Project\main.c(115,13): warning C4024: 'Find': tipi diversi tra il parametro 1 formale e quello effettivo
-C:\Users\thomm\Desktop\API_Project\Project\Project\main.c(129,13): warning C4477: 'printf': con la stringa di formato '%s' è necessario un argomento di tipo 'char *', ma il tipo dell'argomento variadic 1 è 'INGREDIENT *'
-C:\Users\thomm\Desktop\API_Project\Project\Project\main.c(131,22): warning C4477: 'sscanf': con la stringa di formato '%d' è necessario un argomento di tipo 'int *', ma il tipo dell'argomento variadic 2 è 'int'
-  Project.vcxproj -> C:\Users\thomm\Desktop\API_Project\Project\x64\Debug\Project.exe
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(37,29): warning C4047: 'function': 'const char *' differs in levels of indirection from 'char **'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(37,29): warning C4024: 'strcmp': different types for formal and actual parameter 2
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(89,10): warning C4013: 'gets' undefined; assuming extern returning int
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(89,23): warning C4047: '!=': 'int' differs in levels of indirection from 'void *'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(104,11): warning C4047: '=': 'char' differs in levels of indirection from 'char *'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(107,32): warning C4267: '+=': conversion from 'size_t' to 'char', possible loss of data
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(118,12): warning C4047: '=': 'char' differs in levels of indirection from 'char *'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(120,29): warning C4267: '+=': conversion from 'size_t' to 'char', possible loss of data
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(124,13): warning C4047: 'function': 'char **' differs in levels of indirection from 'char [256]'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(124,13): warning C4024: 'Find': different types for formal and actual parameter 1
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(144,44): warning C4267: '+=': conversion from 'size_t' to 'char', possible loss of data
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(172,25): warning C4474: 'sscanf' : too many arguments passed for format string
+  Project.vcxproj -> C:\Users\thomm\Desktop\Project\API_Project\Project\x64\Debug\Project.exe

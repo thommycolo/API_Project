@@ -3,6 +3,8 @@
 #include <string.h>
 #include <stdbool.h>
 
+#include <time.h>
+
 //Globar variable
 
 #define LEN 256
@@ -55,10 +57,18 @@ int Contacifre(int n) {
 
 int main() {
 	
+	// Inizia a misurare il tempo
+	clock_t start_time = clock();
+
+
+
 	// recipes list
-	RECIPE* rec_head = NULL;
+	RECIPE* recipes = NULL;
 	RECIPE* new_recipe = NULL;
 
+	// storage list
+	INGREDIENT* storage = NULL;
+	INGREDIENT* new_ing = NULL;
 
 	//def of the delivery truck
 
@@ -66,17 +76,17 @@ int main() {
 	int delivery_dim = 0;
 
 	scanf(" %d %d ", &delivery_clock, &delivery_dim);
-	printf(" %d %d \n", delivery_clock, delivery_dim);
+	
 
 	int cclock = 0; // is the real clock
 
 	char buffer[BLEN];
-	
-
+	char name[LEN];
 	char key_menu[LEN];
 
+	//char* buffer;
 
-	while ( gets(buffer) != EOF)
+	while ( gets(buffer) != NULL)
 	{
 		
 		//chosing the option and considering the delivery
@@ -88,77 +98,122 @@ int main() {
 
 		sscanf(buffer, "%s", key_menu);
 
-		char* cut_menu;
+
 		//cutting the command
-		cut_menu = strstr(buffer , key_menu);
+		//cut_menu = strstr(buffer , key_menu);
+		*buffer = strstr(buffer, key_menu);
 
-		if (cut_menu != '\0') {
-			cut_menu += strlen(key_menu) + 1;
+		if (buffer != NULL) {
+			*buffer += strlen(key_menu) + 1;
 		}
-		printf("%s\n", key_menu);
-
-		//free(cut_menu);
+		
 
 		if (strcmp(key_menu, "aggiungi_ricetta") == 0)      // aggiungi ricetta
 		{
 			
-			char name[LEN];
-			char* cut_rec;
-			sscanf(cut_menu, "%s", name);
-			printf(" %s\n", name);
+			
+			sscanf(buffer, "%s", name);
+			
 
-			cut_rec = strstr(cut_menu, name);
-			if (cut_rec != NULL) {
-				cut_rec += strlen(name) + 1;	
+			*buffer = strstr(buffer, name);
+			if (buffer != NULL) {
+				*buffer += strlen(name) + 1;
 			}
-			printf("%s\n", cut_rec);
-			if (Find(name, rec_head) == true)
+			
+			
+			if (Find(name, recipes) == true)
 				printf("ignorato\n");
 			else {
 				INGREDIENT* ing_head = NULL;
-				INGREDIENT* new_ing = NULL;
+				new_ing = NULL;
 
-				//char ing[LEN];
-				//int qty = 0;
 
 				new_recipe = malloc(sizeof(RECIPE));
 				strcpy(new_recipe->name, name);
 				
-				while (cut_rec != '\0')
+				while (buffer[0] != '\0')
 				{
-					printf("%s\n", new_ing);
+					
 					new_ing = malloc(sizeof(INGREDIENT));
-					sscanf(cut_rec, "%s %d", new_ing->name, new_ing->quantity);
-					//printf("%s\n", buffer);					
+					sscanf(buffer, "%s %d", &new_ing->name, &new_ing->quantity);
+					
 					new_ing->next = ing_head;
 					ing_head = new_ing;
-
-					if (cut_rec != '\0') {
-						cut_rec += strlen(new_ing->name) + 1 + Contacifre(new_ing->quantity);
-						if (cut_rec[0] == ' ')
-							cut_rec++;
+					
+					if (buffer != NULL) {
+						*buffer += strlen(new_ing->name) + 1 + Contacifre(new_ing->quantity);
+						if (buffer[0] == ' ')
+							*buffer += 1;
 					}
 				}
 				new_recipe->ingredient = ing_head;
-				new_recipe->next = rec_head;
-				rec_head = new_recipe;
+				new_recipe->next = recipes;
+				recipes = new_recipe;
 
+				
+				
 				printf("accettato\n");
+				//===================
+				printf("\n\n\n\n\n\n");
+
+				while (recipes->next != NULL)
+				{
+					printf(" parola %s\n", recipes->name);
+					recipes = recipes->next;
+				}
+
+				printf("\n\n\n\n\n\n");
+				//=====================
 			}
 		}
 		else if (strcmp(key_menu, "rimuovi_ricetta") == 0)	// rimuovi ricetta
 		{
+			bool find = false;
+			sscanf(buffer, "&s", &name);
+			if (strcmp(recipes->name, name) == 0) {
+				recipes = recipes->next;
+				find = true;
+			}
+			else {
+				do {
+					if (strcmp(recipes->next->name, name) == 0) {
+						recipes->next = recipes->next->next;
+						find = true;
+					}
+
+				} while (recipes->next != NULL || find == true);
+			}
+			if(find == true)
+				printf("eliminato\n");
+			else
+				printf("non trovata\n");
 		}
 		else if (strcmp(key_menu, "rifornimento") == 0)		// rifornimento
 		{
+
+
+
+
+
 		}
 		else if (strcmp(key_menu, "ordine") == 0)			// ordine
 		{
 		}
 
 		cclock++;
+		//free(buffer);
 	}
 
+	// Termina la misurazione del tempo
+	clock_t end_time = clock();
+
+	// Calcola il tempo trascorso in secondi
+	double time_taken = ((double)(end_time - start_time)) / CLOCKS_PER_SEC;
+
+	printf("Runtime:: %f s.\n", time_taken);
+
+
+	
 
 	return 0;
 }
