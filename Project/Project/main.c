@@ -25,6 +25,12 @@ typedef struct rec_node {
 	struct rec_node*next;
 }RECIPE;
 
+typedef struct store_node {
+	char name[LEN];
+	int quantity;
+	int dacay;
+	struct store_node*next;
+}STORAGE;
 
 
 // Function declaring
@@ -66,9 +72,10 @@ int main() {
 	RECIPE* recipes = NULL;
 	RECIPE* new_recipe = NULL;
 
+
 	// storage list
-	INGREDIENT* storage = NULL;
-	INGREDIENT* new_ing = NULL;
+	STORAGE* storage = NULL;
+	STORAGE* new_prod = NULL;
 
 	//def of the delivery truck
 
@@ -96,28 +103,31 @@ int main() {
 		}
 
 
+		
+
+
+		
+		
+		
+		// remove the command from the buffer
 		sscanf(buffer, "%s", key_menu);
 
-
-		//cutting the command
-		//cut_menu = strstr(buffer , key_menu);
-		*buffer = strstr(buffer, key_menu);
-
-		if (buffer != NULL) {
-			*buffer += strlen(key_menu) + 1;
+		if (buffer != NULL) {			
+			char* new_buffer = buffer + strlen(key_menu) +1;			
+			memmove(buffer, new_buffer, strlen(new_buffer) + 1);
 		}
-		
+		//----
 
 		if (strcmp(key_menu, "aggiungi_ricetta") == 0)      // aggiungi ricetta
 		{
 			
-			
-			sscanf(buffer, "%s", name);
+			sscanf(buffer, "%s", &name);
 			
 
 			*buffer = strstr(buffer, name);
 			if (buffer != NULL) {
-				*buffer += strlen(name) + 1;
+				char* new_buffer = buffer + strlen(name) + 1 ;
+				memmove(buffer, new_buffer, strlen(new_buffer) + 1);
 			}
 			
 			
@@ -125,26 +135,39 @@ int main() {
 				printf("ignorato\n");
 			else {
 				INGREDIENT* ing_head = NULL;
+				INGREDIENT* new_ing = NULL;
 				new_ing = NULL;
 
 
-				new_recipe = malloc(sizeof(RECIPE));
+				new_recipe = (RECIPE*) malloc(sizeof(RECIPE));
+				
 				strcpy(new_recipe->name, name);
 				
 				while (buffer[0] != '\0')
 				{
 					
-					new_ing = malloc(sizeof(INGREDIENT));
+					new_ing = (INGREDIENT*)malloc(sizeof(INGREDIENT));
 					sscanf(buffer, "%s %d", &new_ing->name, &new_ing->quantity);
 					
 					new_ing->next = ing_head;
 					ing_head = new_ing;
 					
+					
 					if (buffer != NULL) {
-						*buffer += strlen(new_ing->name) + 1 + Contacifre(new_ing->quantity);
+						int len = 0;
+						int tmp = new_ing->quantity;
+						do{
+							len++;
+							tmp= tmp / 10;
+						} while (tmp > 0);
+
+						int bebbo = strlen(new_ing->name) + 1 + len ;
+						char* new_buffer = buffer + bebbo;
 						if (buffer[0] == ' ')
-							*buffer += 1;
+							new_buffer =new_buffer + 1;
+						memmove(buffer, new_buffer, strlen(new_buffer) + 1);
 					}
+
 				}
 				new_recipe->ingredient = ing_head;
 				new_recipe->next = recipes;
@@ -153,23 +176,15 @@ int main() {
 				
 				
 				printf("accettato\n");
-				//===================
-				printf("\n\n\n\n\n\n");
 
-				while (recipes->next != NULL)
-				{
-					printf(" parola %s\n", recipes->name);
-					recipes = recipes->next;
-				}
-
-				printf("\n\n\n\n\n\n");
-				//=====================
+				
 			}
 		}
 		else if (strcmp(key_menu, "rimuovi_ricetta") == 0)	// rimuovi ricetta
 		{
 			bool find = false;
-			sscanf(buffer, "&s", &name);
+			strcpy(name ,"");
+			sscanf(buffer, "%s", name);
 			if (strcmp(recipes->name, name) == 0) {
 				recipes = recipes->next;
 				find = true;
@@ -180,8 +195,9 @@ int main() {
 						recipes->next = recipes->next->next;
 						find = true;
 					}
-
-				} while (recipes->next != NULL || find == true);
+					else
+						recipes = recipes->next;
+				} while (recipes->next != NULL && find != true);
 			}
 			if(find == true)
 				printf("eliminato\n");
@@ -191,10 +207,43 @@ int main() {
 		else if (strcmp(key_menu, "rifornimento") == 0)		// rifornimento
 		{
 
+			while (buffer[0] != '\0')
+			{
+				new_prod = (STORAGE*)malloc(sizeof(STORAGE));
+
+				sscanf(buffer,"%s %d %d", new_prod->name, &new_prod->quantity, &new_prod->dacay);
+
+				new_prod->next = storage;
+				storage = new_prod;
 
 
+				if (buffer != NULL) {
+					int len = 0;
+					int tmp = new_prod->quantity;
+					do {
+						len++;
+						tmp = tmp / 10;
+					} while (tmp > 0);
+
+					tmp = new_prod->dacay;
+
+					do {
+						len++;
+						tmp = tmp / 10;
+					} while (tmp > 0);
 
 
+					int line_len = strlen(new_prod->name) + 1 + len + 1;
+					char* new_buffer = buffer + line_len;
+					if (buffer[0] == ' ')
+						new_buffer = new_buffer + 1;
+					memmove(buffer, new_buffer, strlen(new_buffer) + 1);
+
+					printf(" %s %d %d\n", storage->name, storage->quantity, storage->dacay);
+
+				}
+
+			}
 		}
 		else if (strcmp(key_menu, "ordine") == 0)			// ordine
 		{
