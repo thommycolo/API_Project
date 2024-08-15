@@ -16,20 +16,23 @@
 typedef struct ing_node {
 	char name[LEN];
 	int quantity;
-	struct ing_node*next;
+	struct ing_node* next;
+	struct ing_node* prec;
 }INGREDIENT;
 
 typedef struct rec_node {
 	char name[LEN];
 	INGREDIENT* ingredient;
-	struct rec_node*next;
+	struct rec_node* next;
+	struct rec_node* prec;
 }RECIPE;
 
 typedef struct store_node {
 	char name[LEN];
 	int quantity;
-	int dacay;
-	struct store_node*next;
+	int decay;
+	struct store_node* next;
+	struct store_node* prec;
 }STORAGE;
 
 
@@ -61,6 +64,12 @@ int Contacifre(int n) {
 }
 
 
+
+
+
+
+
+
 int main() {
 	
 	// Inizia a misurare il tempo
@@ -71,7 +80,7 @@ int main() {
 	// recipes list
 	RECIPE* recipes = NULL;
 	RECIPE* new_recipe = NULL;
-
+	int rec_counter = 0;
 
 	// storage list
 	STORAGE* storage = NULL;
@@ -95,17 +104,37 @@ int main() {
 
 	while ( gets(buffer) != NULL)
 	{
+		/*
+		STORAGE* st_tmp = storage;
 		
+		if (st_tmp != NULL) {
+			if (st_tmp->decay == cclock)
+				st_tmp = st_tmp->next;
+			while (st_tmp->next == NULL)
+			{
+				if (st_tmp->next->decay == cclock)
+					st_tmp->next = st_tmp->next->next;
+			}
+		}
+		
+		
+		st_tmp = storage;
+		printf("\n");
+		
+		while (st_tmp != NULL) {
+
+			printf("%d => %s %d %d\n",cclock, st_tmp->name, st_tmp->quantity, st_tmp->decay);
+			st_tmp = st_tmp->next;
+		}
+		
+		printf("\n");
+		
+		*/
 		//chosing the option and considering the delivery
 		if (cclock == delivery_clock) {
 			//delivery
 			cclock = 0;
 		}
-
-
-		
-
-
 		
 		
 		
@@ -176,7 +205,7 @@ int main() {
 				
 				
 				printf("accettato\n");
-
+				rec_counter++;
 				
 			}
 		}
@@ -185,20 +214,61 @@ int main() {
 			bool find = false;
 			strcpy(name ,"");
 			sscanf(buffer, "%s", name);
-			if (strcmp(recipes->name, name) == 0) {
-				recipes = recipes->next;
-				find = true;
+			int scroller = 1;
+
+			if (recipes->next != NULL) {
+
+				if (strcmp(recipes->name, name) == 0) {
+					recipes->next->prec = recipes;
+					recipes = recipes->next;
+					find = true;
+				}
+				else {
+					do {
+						scroller++;
+						if (strcmp(recipes->next->name, name) == 0) {
+							recipes->next = recipes->next->next;
+							find = true;
+						}
+						else {
+							recipes->next->prec = recipes;
+							recipes = recipes->next;
+						}
+					} while (recipes->next != NULL && find != true);
+				}
 			}
 			else {
-				do {
-					if (strcmp(recipes->next->name, name) == 0) {
-						recipes->next = recipes->next->next;
-						find = true;
-					}
-					else
-						recipes = recipes->next;
-				} while (recipes->next != NULL && find != true);
+				if (strcmp(recipes->name, name) == 0) {
+					recipes->prec->next = recipes;
+					recipes = recipes->next;
+					find = true;
+				}
+				else {
+					do {
+						scroller++;
+						if (strcmp(recipes->prec->name, name) == 0) {
+							recipes->prec = recipes->prec->prec;
+							find = true;
+						}
+						else {
+							recipes->prec->next = recipes;
+							recipes = recipes->prec;
+						}
+					} while (recipes->prec != NULL && find != true);
+
+				}
 			}
+
+			if (scroller < (rec_counter / 2)){
+				while (recipes->prec != NULL)
+					recipes = recipes->prec;
+			}
+			else {
+				while (recipes->next != NULL)
+					recipes = recipes->next;
+			}
+
+
 			if(find == true)
 				printf("eliminato\n");
 			else
@@ -211,11 +281,10 @@ int main() {
 			{
 				new_prod = (STORAGE*)malloc(sizeof(STORAGE));
 
-				sscanf(buffer,"%s %d %d", new_prod->name, &new_prod->quantity, &new_prod->dacay);
+				sscanf(buffer,"%s %d %d", new_prod->name, &new_prod->quantity, &new_prod->decay);
 
 				new_prod->next = storage;
 				storage = new_prod;
-
 
 				if (buffer != NULL) {
 					int len = 0;
@@ -225,7 +294,7 @@ int main() {
 						tmp = tmp / 10;
 					} while (tmp > 0);
 
-					tmp = new_prod->dacay;
+					tmp = new_prod->decay;
 
 					do {
 						len++;
@@ -239,11 +308,10 @@ int main() {
 						new_buffer = new_buffer + 1;
 					memmove(buffer, new_buffer, strlen(new_buffer) + 1);
 
-					printf(" %s %d %d\n", storage->name, storage->quantity, storage->dacay);
-
 				}
 
 			}
+			printf("rifornito\n");
 		}
 		else if (strcmp(key_menu, "ordine") == 0)			// ordine
 		{

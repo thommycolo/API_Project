@@ -1,2 +1,8 @@
-222 3333
-rifornimento ingredient0 10 6 ingredient0 10 6 ingredient0 10 6
+3 1000
+rifornimento farina 100 3 farina 70 2
+aggiungi_ricetta torta_della_nonna farina 1
+aggiungi_ricetta torta_paradiso farina 1
+aggiungi_ricetta torta_bwbbi farina 1
+aggiungi_ricetta torta_acca farina 1
+rimuovi_ricetta torta_paradiso farina 1
+rimuovi_ricetta torta_acca farina 1
