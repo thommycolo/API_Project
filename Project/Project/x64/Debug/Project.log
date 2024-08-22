@@ -1,11 +1,4 @@
 ﻿  main.c
-C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(46,29): warning C4047: 'function': 'const char *' differs in levels of indirection from 'char **'
-C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(46,29): warning C4024: 'strcmp': different types for formal and actual parameter 2
-C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(105,10): warning C4013: 'gets' undefined; assuming extern returning int
-C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(105,23): warning C4047: '!=': 'int' differs in levels of indirection from 'void *'
-C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(156,12): warning C4047: '=': 'char' differs in levels of indirection from 'char *'
-C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(163,13): warning C4047: 'function': 'char **' differs in levels of indirection from 'char [256]'
-C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(163,13): warning C4024: 'Find': different types for formal and actual parameter 1
-C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(193,45): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
-C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(305,54): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(170,9): warning C4013: 'gets' undefined; assuming extern returning int
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(170,22): warning C4047: '!=': 'int' differs in levels of indirection from 'void *'
   Project.vcxproj -> C:\Users\thomm\Desktop\Project\API_Project\Project\x64\Debug\Project.exe
