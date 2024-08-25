@@ -32,14 +32,44 @@ typedef struct item_node {
 }ITEM;
 
 
-typedef struct queue_node {
+typedef struct item_queue_node {
 	char name[LEN];
 	ITEM* item;
-	struct queue_node* next;
+	struct item_queue_node* next;
 }ITEM_QUEUE;
 
+/*
+typedef struct production_queue_node {
+	RECIPE* recipe;
+	int clock;
+	int quantity;
+	struct production_queue_node* next;
+}WAIT_LIST;
+*/
+typedef struct ing_pointer_node {
+	ITEM_QUEUE* recipe_ingredients;
+	struct ing_pointer_node* next;
+}ING_POINTER;
 
+typedef struct order_pointers_node {
+	RECIPE* recipe;
+	ING_POINTER* ing_pointer;
+}ORDER_POINTERS;
 
+typedef struct wait_list_node {
+	ORDER_POINTERS* order_pointer;
+	int time;
+	int quantity;
+	struct wait_list_node* next;
+}WAIT_LIST;
+
+typedef struct delivery_truck_node {
+	char name[LEN];
+	int time;
+	int quantity;
+	int weight;
+	struct delivery_truck_node* next;
+}DELIVERY_TRUCK;
 
 
 // Function declaring
@@ -131,59 +161,152 @@ char* Chop_two_int(char* phrase, int num1, int num2) {
 		return phrase;
 }
 
-int Check_ing_for_order(RECIPE* recipe, ITEM_QUEUE* storage, char name[LEN], int num) {
+
+
+
+ING_POINTER* Delete_ingredient_from_research(ING_POINTER* order_ing_pointer) {
+	while (order_ing_pointer != NULL) {
+		ING_POINTER* tmp = order_ing_pointer;
+		order_ing_pointer = order_ing_pointer->next;
+		free(tmp);
+	}
+	return NULL;
+}
+
+bool  Find_in_WaitList(WAIT_LIST* wait_list, char name[LEN]) {
+	bool find = false;
+	while (wait_list != NULL && find != true) {
+		if (strcmp(wait_list->order_pointer->recipe->name, name) == 0)
+			find = true;
+		else
+			wait_list = wait_list->next;
+	}
+	return find;
+}
+
+ORDER_POINTERS* Check_ing_for_order(RECIPE* recipe, ITEM_QUEUE* storage, char name[LEN], int num) {
+	// check if the recipe and the ingredient are ok for making the order.
+
+	ORDER_POINTERS* order_pointers = NULL;
+
 	bool recipe_check = false;
-	bool ingredient_check = false;
-	while (recipe != NULL || recipe_check != true) {
+	while (recipe != NULL && recipe_check != true) {
 		if (strcmp(recipe->name, name) == 0) {
+			order_pointers = (ORDER_POINTERS*)malloc(sizeof(ORDER_POINTERS));
+
+			order_pointers->recipe = recipe;
 			recipe_check = true;
-			INGREDIENT* ing = recipe->ingredient;
-			
-			while (ing != NULL || storage != NULL) { // check if all the ingredient are in enough quantity in storage
-				bool ing_check_tmp = false;
-				while (storage != NULL || ing_check_tmp != true) { // check if every single ingredient have enough quantity in storage
-					if (strcmp(ing, storage->name) == 0) {
-						ITEM* item_tmp = storage->item;
-						if ((ing->quantity * num) <= storage->item->quantity) {
-							ing_check_tmp = true;
-							//code here to remove ing from storage when is all in one place
-						}
-						else if ((ing->quantity * num) > storage->item->quantity && storage->item->next != NULL) {
-							ITEM* item = storage->item;
-							int tot = ing->quantity * num;
-							while (item != NULL || tot != 0) {
 
-								if (tot > item->quantity && item->next != NULL) {
-									tot = tot - item->quantity;
-									//code here to remove ing from storage when is in more place
-								}
-								item = item->next;
-							}
-							if (tot == 0) // if ok, check = true
-								ing_check_tmp = true;
-						}
+			ING_POINTER* order_ing_pointer = NULL;
 
+			INGREDIENT* ing = order_pointers->recipe->ingredient;
+			bool not_enough_item = false;
+
+			while (ing != NULL && storage != NULL && not_enough_item != true) {
+				bool find_ingredient = false;
+				if (strcmp(ing->name, storage->name) == 0) { // check if all the ingredients are in and if so save the head
+					find_ingredient = true;
+
+					int tot = ing->quantity * num;
+
+					if (tot <= storage->item->quantity) {
+						ING_POINTER* new_order_ing_pointer = (ING_POINTER*)malloc(sizeof(ING_POINTER));
+						new_order_ing_pointer->recipe_ingredients = storage;
+
+						new_order_ing_pointer->next = order_ing_pointer;
+						order_ing_pointer = new_order_ing_pointer;
 					}
-					if (ing_check_tmp != true) // if ok, check = true
-						storage = storage->next;
-					else
-						ing = ing->next;
-				}
-				if (ing == NULL) // if ok, check = true
-					ingredient_check = true;
+					else if (tot > storage->item->quantity) {
 
+						ITEM_QUEUE* storage_tmp = storage;
+						while (tot != 0 && storage_tmp->item != NULL) {
+							tot -= storage_tmp->item->quantity;
+							storage_tmp->item = storage_tmp->item->next;
+						}
+						if (storage_tmp->item != NULL) {
+							ING_POINTER* new_order_ing_pointer = (ING_POINTER*)malloc(sizeof(ING_POINTER));
+							new_order_ing_pointer->recipe_ingredients = storage;
+
+							new_order_ing_pointer->next = order_ing_pointer;
+							order_ing_pointer = new_order_ing_pointer;
+						}
+						else {
+							order_ing_pointer = Delete_ingredient_from_research(order_ing_pointer);
+							not_enough_item = true;
+						}
+					}
+					storage = storage->next;
+					ing = ing->next;
+				}
+				else {
+					if (find_ingredient == false) {
+						storage = storage->next;
+						if (strcmp(ing->name, storage->name) < 0) {
+							order_ing_pointer = Delete_ingredient_from_research(order_ing_pointer);
+							not_enough_item = true;
+						}
+					}
+				}
 			}
+
+			order_pointers->ing_pointer = order_ing_pointer;
+
 		}
+		else {
+			recipe = recipe->next;
+		}
+
 	}
 
-	if (recipe_check == true && ingredient_check == true)
-		return 1; // order is ready to be done
-	else if (recipe_check == true && ingredient_check == false)
-		return 2; // order need to be set in queue 
-	else
-		return 0; // order cannot be accepted
+	return order_pointers;
+
+}
+
+DELIVERY_TRUCK* Prepare_the_order(WAIT_LIST* order_list) {
+
+	DELIVERY_TRUCK* delivery_truck = (DELIVERY_TRUCK*)malloc(sizeof(DELIVERY_TRUCK));
+	delivery_truck->time = order_list->time;
+	strcpy(delivery_truck->name, order_list->order_pointer->recipe->name);
+	delivery_truck->quantity = order_list->quantity;
+	delivery_truck->weight = 0;
+	
+	delivery_truck->next = NULL;
+
+	INGREDIENT* ing = order_list->order_pointer->recipe->ingredient;
+	ING_POINTER* ing_point = order_list->order_pointer->ing_pointer;
+	while (ing != NULL) {
+		ITEM_QUEUE* storage = ing_point->recipe_ingredients;
+		int tot = ing->quantity * order_list->quantity;
+		if (tot < storage->item->quantity) {
+			storage->item->quantity = storage->item->quantity - tot;
+		}
+		else if (tot == storage->item->quantity) {
+			ITEM* tmp = storage->item;
+			storage->item = storage->item->next;
+			free(tmp);
+		}
+		else {
+			int tot_tmp = tot;
+			while (tot_tmp != 0) {
+				if (tot_tmp < storage->item->quantity) {
+					storage->item->quantity = storage->item->quantity - tot_tmp;
+					tot_tmp = 0;
+				}
+				else if (tot_tmp >= storage->item->quantity) {
+					tot_tmp = tot_tmp - storage->item->quantity;
+					ITEM* tmp = storage->item;
+					storage->item = storage->item->next;
+					free(tmp);
+				}
+			}
+
+		}
+		ing = ing->next;
+		delivery_truck->weight += tot;
+	}
 
 
+	return delivery_truck;
 }
 
 
@@ -203,6 +326,15 @@ int main() {
 	// ITEM_QUEUE list
 	ITEM_QUEUE* prod = NULL;
 	ITEM_QUEUE* new_prod = NULL;
+
+	// order in wait list
+	WAIT_LIST* wait_list = NULL;
+
+
+
+
+	// order ready for the DELIVERY_TRUCK
+	DELIVERY_TRUCK* delivery_truck = NULL;
 
 	//def of the delivery truck
 
@@ -226,7 +358,7 @@ int main() {
 		//chosing the option and considering the delivery
 		if (program_clock % delivery_clock == 0) {
 			//delivery
-			
+
 		}
 
 
@@ -323,12 +455,12 @@ int main() {
 						bool sorted = false;
 						INGREDIENT* ing_tmp = ing_head;
 						while (sorted != true) {
-							
+
 							if (ing_tmp->next == NULL) {
 								ing_tmp->next = new_ing;
 								sorted = true;
 							}
-							else if (strcmp(new_ing->name, ing_tmp->name) < 0){
+							else if (strcmp(new_ing->name, ing_tmp->name) < 0) {
 								new_ing->next = ing_head;
 								ing_head = new_ing;
 								sorted = true;
@@ -372,27 +504,33 @@ int main() {
 			sscanf(buffer, "%s", name);
 			RECIPE* find_recipe = recipes;
 
-			if (strcmp(find_recipe->name, name) == 0) {
-				RECIPE* tmp = find_recipe;
-				find_recipe = find_recipe->next;
-				free(tmp);
-				find = true;
-			}
-			else if (find_recipe->next != NULL) {
-				while (find_recipe->next != NULL) {
-					if (strcmp(find_recipe->next->name, name) == 0) {
-						RECIPE* tmp = find_recipe->next;
-						find_recipe->next = find_recipe->next->next;
-						free(tmp);
-						find = true;
-						break;
-					}
-					else {
-						find_recipe = find_recipe->next;
+
+			bool find_in_ws = Find_in_WaitList(wait_list, name);
+			if (find_in_ws != true) {
+				if (strcmp(find_recipe->name, name) == 0) {
+					RECIPE* tmp = find_recipe;
+					recipes = find_recipe->next;
+					free(tmp);
+					find = true;
+				}
+				else if (find_recipe->next != NULL) {
+					while (find_recipe->next != NULL) {
+						if (strcmp(find_recipe->next->name, name) == 0) {
+							RECIPE* tmp = find_recipe->next;
+							find_recipe->next = find_recipe->next->next;
+							free(tmp);
+							find = true;
+							break;
+						}
+						else {
+							find_recipe = find_recipe->next;
+						}
 					}
 				}
 			}
-
+			else {
+				find = true;
+			}
 			if (find == true)
 				printf("eliminato\n");
 			else
@@ -421,7 +559,7 @@ int main() {
 				if (storage != NULL)
 				{
 					ITEM* new_item = NULL;
-					
+
 
 					if (strcmp(storage->name, tmp_name) == 0)
 						find = true;
@@ -448,13 +586,13 @@ int main() {
 									ITEM* tmp = storage->item;
 									while (sort == false) {
 										//
-										if (tmp->next != NULL &&  tmp->next->decay > new_item->decay) {
+										if (tmp->next != NULL && tmp->next->decay > new_item->decay) {
 											new_item->next = tmp->next;
 											tmp->next = new_item;
-											sort =true;
+											sort = true;
 										}
 										else {
-											
+
 											if (tmp->next == NULL) {
 												new_item->next = NULL;
 												tmp->next = new_item;
@@ -494,10 +632,10 @@ int main() {
 					new_item = (ITEM*)malloc(sizeof(ITEM));
 					new_item->next = NULL;
 					sscanf(buffer, "%d %d", &new_item->quantity, &new_item->decay);
-					
+
 					new_prod->item = new_item;
 
-				
+
 					if (prod == NULL)
 					{
 						new_prod->next = prod;
@@ -515,12 +653,12 @@ int main() {
 						bool sorted = false;
 						ITEM_QUEUE* prod_tmp = prod;
 						while (sorted != true) {
-							
+
 							if (prod_tmp->next == NULL) {
 								prod_tmp->next = new_prod;
 								sorted = true;
 							}
-							else if (strcmp(new_prod->name, prod_tmp->name) < 0){
+							else if (strcmp(new_prod->name, prod_tmp->name) < 0) {
 								new_prod->next = prod;
 								prod = new_prod;
 								sorted = true;
@@ -538,40 +676,61 @@ int main() {
 
 						}
 					}
-					
+
 
 					bebbo = Chop_two_int(buffer, new_item->quantity, new_item->decay);
 					if (bebbo != NULL)
 						strcpy(buffer, bebbo);
 					else
 						buffer[0] = '\0';
-					
+
 				}
 
 			}
 
-		
+
 			printf("rifornito\n");
 		}
 		else if (strcmp(key_menu, "ordine") == 0)			// ordine
 		{
 			int number = 0;
 
-			sscanf(buffer, "%s %d", &name,&number);
+			sscanf(buffer, "%s %d", &name, &number);
 
-			
-			int order = Check_ing_for_order(recipes, prod, name, number);
-			
-			if (order == 1) {
-				// go 
-			}
-			else if (order == 2) {
-				// queue
-			}
-			else {
-				//not accepted
-			}
+			// struct for saving pointers for the order
+			ORDER_POINTERS* order_pointers = NULL;
 
+			order_pointers = Check_ing_for_order(recipes, prod, name, number);
+
+
+			if (order_pointers != NULL) { // if != NULL im shure that at least the Recipe exist
+
+
+				WAIT_LIST* new_wait_list = (WAIT_LIST*)malloc(sizeof(WAIT_LIST));
+
+				new_wait_list->order_pointer = order_pointers;
+				new_wait_list->time = program_clock;
+				new_wait_list->quantity = number;
+
+				if (order_pointers->ing_pointer != NULL) {
+					// delivery_truck
+					DELIVERY_TRUCK* new_delivery = (DELIVERY_TRUCK*)malloc(sizeof(DELIVERY_TRUCK));
+					new_delivery = Prepare_the_order(new_wait_list);
+					free(new_wait_list);//delete the temporari storing
+
+					new_delivery->next = delivery_truck;
+					delivery_truck = new_delivery;
+
+				}
+				else {
+					// wait_list
+					new_wait_list->next = wait_list;
+					wait_list = new_wait_list;
+				}
+				printf("Accettato\n");
+			}
+			else
+				printf("Rifiutato\n");
 
 
 		}
