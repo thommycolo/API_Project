@@ -1,4 +1,4 @@
 ﻿  main.c
-C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(355,9): warning C4013: 'gets' undefined; assuming extern returning int
-C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(355,22): warning C4047: '!=': 'int' differs in levels of indirection from 'void *'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(413,9): warning C4013: 'gets' undefined; assuming extern returning int
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(413,22): warning C4047: '!=': 'int' differs in levels of indirection from 'void *'
   Project.vcxproj -> C:\Users\thomm\Desktop\Project\API_Project\Project\x64\Debug\Project.exe
