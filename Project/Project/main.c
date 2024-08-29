@@ -153,43 +153,101 @@ char* Chop_two_int(char* phrase, int num1, int num2) {
 }
 
 
-ITEM_QUEUE* Check_if_somethink_is_rotten(ITEM_QUEUE* prod, int program_clock) {
-	if (prod != NULL) {
-		ITEM_QUEUE* check_storage = prod;
-		if (check_storage->next == NULL) {
-			ITEM* item_tmp = check_storage->item;
-			while (item_tmp != NULL && item_tmp->decay <= program_clock)
-			{
-				ITEM* tmp = item_tmp;
-				item_tmp = item_tmp->next;
-				free(tmp);
+ITEM* Add_item(ITEM_QUEUE* storage, ITEM* new_item) {
+	if (storage->item->decay > new_item->decay) {
+		new_item->next = storage->item;
+		storage->item = new_item;
+	}
+	else {
+		bool sort = false;
+		ITEM* tmp = storage->item;
+		while (sort == false) {
+			//
+			if (tmp->next != NULL && tmp->next->decay > new_item->decay) {
+				new_item->next = tmp->next;
+				tmp->next = new_item;
+				sort = true;
 			}
-			if (item_tmp == NULL) {
-				ITEM_QUEUE* storage_tmp = check_storage;
-				check_storage = check_storage->next;
-				free(storage_tmp);
-			}
-		}
-		else {
-			while (check_storage->next != NULL) {
+			else {
 
-				ITEM* item_tmp = check_storage->next->item;
-				while (item_tmp != NULL && item_tmp->decay <= program_clock)
-				{
-					ITEM* tmp = item_tmp;
-					item_tmp = item_tmp->next;
-					free(tmp);
-				}
-				if (item_tmp == NULL) {
-					ITEM_QUEUE* storage_tmp = check_storage->next;
-					check_storage->next = check_storage->next->next;
-					free(storage_tmp);
+				if (tmp->next == NULL) {
+					new_item->next = NULL;
+					tmp->next = new_item;
+					new_item = tmp;
+					sort = true;
 				}
 				else
-					check_storage = check_storage->next;
+					tmp = tmp->next;
 			}
 		}
 	}
+	return storage->item;
+}
+
+ITEM_QUEUE* Check_if_somethink_is_rotten(ITEM_QUEUE* prod, int program_clock) {
+	
+	if (prod != NULL) {
+		//ITEM_QUEUE* prod_next = prod->next;
+		if (prod->next == NULL) { // if there is only 1 element in prod
+			//ITEM* item_tmp = check_storage->item;
+			while (prod->item != NULL && prod->item->decay <= program_clock)
+			{
+				ITEM* tmp = prod->item;
+				prod->item = prod->item->next;
+				free(tmp);
+			}
+			if (prod->item == NULL) {
+				free(prod);
+				prod = NULL;
+			}
+		}
+		else if (prod->item == NULL) {
+
+			while (prod != NULL && prod->item == NULL) {
+
+				if (prod->item == NULL) {
+					while (prod->item != NULL) {
+						ITEM* tmp = prod->next->item;
+						prod->next->item = prod->next->item->next;
+						free(tmp);
+					}
+					if (prod->item == NULL) {
+						ITEM_QUEUE* storage_tmp = prod;
+						prod = prod->next;
+						free(storage_tmp);
+					}
+				}
+			}
+
+		}
+		else {
+			ITEM_QUEUE* prod_tmp = prod;
+			while (prod_tmp != NULL) {// if there at least 2 element in prod
+
+				//ITEM* item_tmp = check_storage->next->item;
+				if (prod_tmp->next != NULL) {
+					while (prod_tmp->next->item != NULL && prod_tmp->next->item->decay <= program_clock)
+					{
+						ITEM* tmp = prod_tmp->next->item;
+						prod_tmp->next->item = prod_tmp->next->item->next;
+						free(tmp);
+					}
+					if (prod_tmp->next->item == NULL) {
+						ITEM_QUEUE* storage_tmp = prod_tmp->next;
+						prod_tmp->next = prod_tmp->next->next;
+						prod_tmp = prod_tmp->next;
+						free(storage_tmp);
+					}
+					else
+						prod_tmp = prod_tmp->next;
+				}
+				else {
+					prod_tmp = prod_tmp->next;
+				}
+			}
+		}
+	}
+
 	return prod;
 }
 
@@ -206,7 +264,7 @@ ING_POINTER* Delete_ingredient_from_research(ING_POINTER* order_ing_pointer) {
 ING_POINTER* Check_all_the_ing_after_refill(INGREDIENT* ing, ITEM_QUEUE* storage, int num) {
 
 	ING_POINTER* order_ing_pointer = NULL;
-
+	ING_POINTER* order_ing_pointer_tail = NULL;
 
 	bool not_enough_item = false;
 
@@ -217,39 +275,62 @@ ING_POINTER* Check_all_the_ing_after_refill(INGREDIENT* ing, ITEM_QUEUE* storage
 
 			int tot = ing->quantity * num;
 
-			if (tot <= storage->item->quantity) {
-				ING_POINTER* new_order_ing_pointer = (ING_POINTER*)malloc(sizeof(ING_POINTER));
-				new_order_ing_pointer->recipe_ingredients = storage;
+			if (storage->item != NULL) {
+				if (tot > storage->item->quantity) {
 
-				new_order_ing_pointer->next = order_ing_pointer;
-				order_ing_pointer = new_order_ing_pointer;
-			}
-			else if (tot > storage->item->quantity) {
-
-				ITEM_QUEUE* storage_tmp = storage;
-				while (tot != 0 && storage_tmp->item != NULL) {
-					tot -= storage_tmp->item->quantity;
-					storage_tmp->item = storage_tmp->item->next;
+					ITEM* item_list = storage->item;
+					while (tot > 0 && item_list != NULL) {
+						tot -= item_list->quantity;
+						if (tot > 0) {
+							item_list = item_list->next;
+						}
+					}
+					if (item_list != NULL) {
+						ING_POINTER* new_order_ing_pointer = (ING_POINTER*)malloc(sizeof(ING_POINTER));
+						new_order_ing_pointer->recipe_ingredients = storage;
+						if (order_ing_pointer == NULL) {
+							new_order_ing_pointer->next = NULL;
+							order_ing_pointer = new_order_ing_pointer;
+							order_ing_pointer_tail = order_ing_pointer;
+						}
+						else {
+							new_order_ing_pointer->next = NULL;
+							order_ing_pointer_tail->next = new_order_ing_pointer;
+							order_ing_pointer_tail = new_order_ing_pointer;
+						}
+					}
+					else {
+						order_ing_pointer = Delete_ingredient_from_research(order_ing_pointer);
+						not_enough_item = true;
+					}
 				}
-				if (storage_tmp->item != NULL) {
+				else if (tot <= storage->item->quantity) {
 					ING_POINTER* new_order_ing_pointer = (ING_POINTER*)malloc(sizeof(ING_POINTER));
 					new_order_ing_pointer->recipe_ingredients = storage;
 
-					new_order_ing_pointer->next = order_ing_pointer;
-					order_ing_pointer = new_order_ing_pointer;
+					if (order_ing_pointer == NULL) {
+						new_order_ing_pointer->next = NULL;
+						order_ing_pointer = new_order_ing_pointer;
+						order_ing_pointer_tail = order_ing_pointer;
+					}
+					else {
+						new_order_ing_pointer->next = NULL;
+						order_ing_pointer_tail->next = new_order_ing_pointer;
+						order_ing_pointer_tail = new_order_ing_pointer;
+					}
 				}
-				else {
-					order_ing_pointer = Delete_ingredient_from_research(order_ing_pointer);
-					not_enough_item = true;
-				}
+				storage = storage->next;
+				ing = ing->next;
 			}
-			storage = storage->next;
-			ing = ing->next;
+			else {
+				order_ing_pointer = Delete_ingredient_from_research(order_ing_pointer);
+				not_enough_item = true;
+			}
 		}
 		else {
 			if (find_ingredient == false) {
 				storage = storage->next;
-				if (strcmp(ing->name, storage->name) < 0) {
+				if (storage == NULL || strcmp(ing->name, storage->name) < 0) {
 					order_ing_pointer = Delete_ingredient_from_research(order_ing_pointer);
 					not_enough_item = true;
 				}
@@ -287,8 +368,8 @@ ORDER_POINTERS* Check_ing_for_order(RECIPE* recipe, ITEM_QUEUE* storage, char na
 			recipe_check = true;
 
 			ING_POINTER* order_ing_pointer = NULL;
-
-			order_ing_pointer = Check_all_the_ing_after_refill(recipe->ingredient, storage, num);
+			if (storage != NULL)
+				order_ing_pointer = Check_all_the_ing_after_refill(recipe->ingredient, storage, num);
 
 			order_pointers->ing_pointer = order_ing_pointer;
 
@@ -310,15 +391,30 @@ DELIVERY_TRUCK* sort_the_new_order(DELIVERY_TRUCK* new_delivery, DELIVERY_TRUCK*
 	else {
 		DELIVERY_TRUCK* delivery_truck_tmp = delivery_truck;
 		bool sorted = false;
-		while (delivery_truck_tmp != NULL && sorted != true) {
-			if (delivery_truck->next->time > new_delivery->time) {
-				new_delivery->next = delivery_truck_tmp->next;
-				delivery_truck_tmp->next = new_delivery;
+		if (delivery_truck->next == NULL)
+		{
+			if (delivery_truck->time > new_delivery->time) {
+				new_delivery->next = delivery_truck;
+				delivery_truck = new_delivery;
 			}
 			else
-				delivery_truck_tmp = delivery_truck_tmp->next;
+				delivery_truck->next = new_delivery;
 		}
-
+		else {
+			while (sorted != true) { //delivery_truck_tmp != NULL &&
+				if (delivery_truck_tmp->next == NULL) {
+					delivery_truck_tmp->next = new_delivery;
+					sorted = true;
+				}
+				if (delivery_truck->next->time > new_delivery->time) {
+					new_delivery->next = delivery_truck_tmp->next;
+					delivery_truck_tmp->next = new_delivery;
+					sorted = true;
+				}
+				else
+					delivery_truck_tmp = delivery_truck_tmp->next;
+			}
+		}
 	}
 
 	return delivery_truck;
@@ -349,7 +445,7 @@ DELIVERY_TRUCK* Prepare_the_order(WAIT_LIST* order_list, DELIVERY_TRUCK* deliver
 		}
 		else {
 			int tot_tmp = tot;
-			while (tot_tmp != 0) {
+			while (tot_tmp > 0) {
 				if (tot_tmp < storage->item->quantity) {
 					storage->item->quantity = storage->item->quantity - tot_tmp;
 					tot_tmp = 0;
@@ -359,17 +455,33 @@ DELIVERY_TRUCK* Prepare_the_order(WAIT_LIST* order_list, DELIVERY_TRUCK* deliver
 					ITEM* tmp = storage->item;
 					storage->item = storage->item->next;
 					free(tmp);
+					//storage = tmp;
 				}
 			}
 
 		}
 		ing = ing->next;
+		ing_point = ing_point->next;
 		new_delivery->weight += tot;
 	}
 
 	delivery_truck = sort_the_new_order(new_delivery, delivery_truck);
 
 	return delivery_truck;
+}
+
+DELIVERY_TRUCK* Copy_truck_value(DELIVERY_TRUCK* delivery_truck) {
+	DELIVERY_TRUCK* loading_queue = (DELIVERY_TRUCK*)malloc(sizeof(DELIVERY_TRUCK));
+	if (delivery_truck != NULL) {
+		strcpy(loading_queue->name, delivery_truck->name);
+		loading_queue->quantity = delivery_truck->quantity;
+		loading_queue->time = delivery_truck->time;
+		loading_queue->weight = delivery_truck->weight;
+		loading_queue->next = NULL;
+	}
+	else
+		loading_queue = NULL;
+	return loading_queue;
 }
 
 int main() {
@@ -390,7 +502,7 @@ int main() {
 
 	// order in wait list
 	WAIT_LIST* wait_list = NULL;
-
+	WAIT_LIST* wait_list_tail = NULL;
 
 	// order ready for the DELIVERY_TRUCK
 	DELIVERY_TRUCK* delivery_truck = NULL;
@@ -402,7 +514,7 @@ int main() {
 
 	scanf(" %d %d ", &delivery_clock, &delivery_dim);
 
-
+	//int program_clock = 2; //id the debugger clock
 	int program_clock = 0; // is the real clock
 
 	char buffer[BLEN];
@@ -412,54 +524,53 @@ int main() {
 
 	while (gets(buffer) != NULL)
 	{
-
+		//printf("%d. ", program_clock);
 		//chosing the option and considering the delivery
-		if (program_clock % delivery_clock == 0) {
+		if (program_clock != 0 && program_clock % delivery_clock == 0) {
 			//delivery
 			int load = 0;
-			
+
+
+			DELIVERY_TRUCK* new_loading_queue = NULL;
 			DELIVERY_TRUCK* loading_queue = NULL;
 
-
 			if (delivery_truck != NULL) {
-				while (load < delivery_dim) {
+				while (delivery_truck != NULL && load < delivery_dim) {
 
 					load += delivery_truck->weight;
 					if (load < delivery_dim) {
+						new_loading_queue = Copy_truck_value(delivery_truck);
 
 						if (loading_queue == NULL) {
-							loading_queue = delivery_truck;
-							loading_queue->next = NULL;
+							loading_queue = new_loading_queue;
 						}
+
 						else if (loading_queue->next == NULL) {
-							if (loading_queue->weight < delivery_truck->weight) {
-								delivery_truck->next = loading_queue;
-								loading_queue = delivery_truck;
+							if (loading_queue->weight < new_loading_queue->weight) {
+								new_loading_queue->next = loading_queue;
+								loading_queue = new_loading_queue;
 							}
 							else {
-								DELIVERY_TRUCK* loading_queue_tmp = delivery_truck;
-								loading_queue_tmp->next = NULL;
-								loading_queue->next = loading_queue_tmp;
-
+								loading_queue->next = new_loading_queue;
 							}
 
 						}
-						else if (loading_queue->weight < delivery_truck->weight) {
-							DELIVERY_TRUCK* loading_queue_tmp = delivery_truck;
-							loading_queue_tmp->next = loading_queue;
-
-							loading_queue = loading_queue_tmp;
+						else if (loading_queue->weight < new_loading_queue->weight) {
+							new_loading_queue->next = loading_queue;
+							loading_queue = new_loading_queue;
 						}
 						else {
 							DELIVERY_TRUCK* loading_queue_tmp = loading_queue;
 							bool sorted = false;
 
 							while (loading_queue_tmp != NULL && sorted != true) {
-
-								if (loading_queue_tmp->next->weight < delivery_truck->weight) {
-									DELIVERY_TRUCK* queue_tmp = delivery_truck;
-									queue_tmp->next = loading_queue_tmp->next;
-									loading_queue_tmp->next = queue_tmp;
+								if (loading_queue_tmp->next == NULL) {
+									loading_queue_tmp->next = new_loading_queue;
+									sorted = true;
+								}
+								if (loading_queue_tmp->next->weight < new_loading_queue->weight) {
+									new_loading_queue->next = loading_queue_tmp->next;
+									loading_queue_tmp->next = new_loading_queue;
 									sorted = true;
 								}
 								else
@@ -467,9 +578,10 @@ int main() {
 							}
 
 						}
-						DELIVERY_TRUCK* delivery_tmp = delivery_truck;
-						delivery_truck = delivery_truck->next;
-						free(delivery_tmp);
+						DELIVERY_TRUCK* delivery_tmp = delivery_truck->next;
+						free(delivery_truck);
+						delivery_truck = delivery_tmp;
+						//free(delivery_tmp);
 					}
 
 				}
@@ -534,18 +646,22 @@ int main() {
 					new_ing->next = NULL;
 					sscanf(buffer, "%s %d", new_ing->name, &new_ing->quantity);
 
-					if (ing_head == NULL)
-					{
+					if (ing_head == NULL) {
 						new_ing->next = ing_head;
 						ing_head = new_ing;
 					}
-					else if (ing_head->next == NULL) {
+					else if (ing_head != NULL && ing_head->next == NULL) {
 						if (strcmp(new_ing->name, ing_head->name) < 0) {
 							new_ing->next = ing_head;
+							ing_head = new_ing;
 						}
 						else {
 							ing_head->next = new_ing;
 						}
+					}
+					else if (strcmp(new_ing->name, ing_head->name) < 0) {
+						new_ing->next = ing_head;
+						ing_head = new_ing;
 					}
 					else {
 						bool sorted = false;
@@ -554,11 +670,6 @@ int main() {
 
 							if (ing_tmp->next == NULL) {
 								ing_tmp->next = new_ing;
-								sorted = true;
-							}
-							else if (strcmp(new_ing->name, ing_tmp->name) < 0) {
-								new_ing->next = ing_head;
-								ing_head = new_ing;
 								sorted = true;
 							}
 							else {
@@ -588,7 +699,7 @@ int main() {
 
 
 
-				printf("accettato\n");
+				printf("aggiunta\n");
 				rec_counter++;
 
 			}
@@ -623,14 +734,16 @@ int main() {
 						}
 					}
 				}
+				if (find == true)
+					printf("rimossa\n");
+				else
+					printf("non presente\n");
 			}
 			else {
-				find = true;
+				printf("ordini in sospeso\n");
 			}
-			if (find == true)
-				printf("eliminato\n");
-			else
-				printf("non trovata\n");
+
+
 
 		}
 		else if (strcmp(key_menu, "rifornimento") == 0)		// rifornimento
@@ -657,9 +770,21 @@ int main() {
 					ITEM* new_item = NULL;
 
 
-					if (strcmp(storage->name, tmp_name) == 0)
+					if (strcmp(storage->name, tmp_name) == 0) {
 						find = true;
+						new_item = (ITEM*)malloc(sizeof(ITEM));
+						new_item->next = NULL;
+						sscanf(buffer, "%d %d", &new_item->quantity, &new_item->decay);
 
+						bebbo = Chop_two_int(buffer, new_item->quantity, new_item->decay);
+						if (bebbo == NULL)
+							buffer[0] = '\0';
+						else
+							strcpy(buffer, bebbo);
+
+						storage->item = Add_item(storage, new_item);
+
+					}
 					// item is alredy in ITEM_QUEUE------------------------------------
 					if (storage->next != NULL) {
 						while (find == false && storage->next != NULL)
@@ -671,35 +796,12 @@ int main() {
 								sscanf(buffer, "%d %d", &new_item->quantity, &new_item->decay);
 
 								bebbo = Chop_two_int(buffer, new_item->quantity, new_item->decay);
-								strcpy(buffer, bebbo);
+								if (bebbo == NULL)
+									buffer[0] = '\0';
+								else
+									strcpy(buffer, bebbo);
 
-								if (storage->item->decay > new_item->decay) {
-									new_item->next = storage->item;
-									storage->item = new_item;
-								}
-								else {
-									bool sort = false;
-									ITEM* tmp = storage->item;
-									while (sort == false) {
-										//
-										if (tmp->next != NULL && tmp->next->decay > new_item->decay) {
-											new_item->next = tmp->next;
-											tmp->next = new_item;
-											sort = true;
-										}
-										else {
-
-											if (tmp->next == NULL) {
-												new_item->next = NULL;
-												tmp->next = new_item;
-												sort = true;
-											}
-											else
-												tmp = tmp->next;
-										}
-									}
-								}
-
+								storage->item = Add_item(storage, new_item);
 
 								find = true;
 							}
@@ -740,6 +842,7 @@ int main() {
 					else if (prod->next == NULL) {
 						if (strcmp(new_prod->name, prod->name) < 0) {
 							new_prod->next = prod;
+							prod = new_prod;
 						}
 						else {
 							prod->next = new_prod;
@@ -783,53 +886,68 @@ int main() {
 				}
 
 			}
-
+			//prod;
 			// check if now some order in wait list can be processed
 			if (wait_list != NULL) {
-				WAIT_LIST* wait_list_tmp = wait_list;
-
 				ING_POINTER* ing_pointers = NULL;
-				INGREDIENT* ing = wait_list_tmp->order_pointer->recipe->ingredient;
-				int num = wait_list_tmp->quantity;
 
-				//research if now I have all the ingredients in the first place
+				do { // cycle untill all the order in wait_list in time order can be performed
+					ing_pointers = NULL;
+					INGREDIENT* ing = wait_list->order_pointer->recipe->ingredient;
+					int num = wait_list->quantity;
 
-				ing_pointers = Check_all_the_ing_after_refill(ing, prod, num);
+					ing_pointers = Check_all_the_ing_after_refill(ing, prod, num);
 
-				if (ing_pointers != NULL) {
+					if (ing_pointers != NULL) {
 
-					delivery_truck = Prepare_the_order(wait_list, delivery_truck);
+						wait_list->order_pointer->ing_pointer = ing_pointers;
+						delivery_truck = Prepare_the_order(wait_list, delivery_truck);
 
-					wait_list = wait_list->next;
-					wait_list_tmp = wait_list_tmp->next;
+						WAIT_LIST* free_wait_list = wait_list;
+						wait_list = wait_list->next;
 
-					free(wait_list_tmp);
+						free(free_wait_list);
 
-				}
-				else {
-					while (wait_list_tmp != NULL) {
-						ing_pointers = NULL;
-						INGREDIENT* ing = wait_list_tmp->next->order_pointer->recipe->ingredient;
-						num = wait_list_tmp->next->quantity;
-
-						//research if now I have all the ingredients
-						ing_pointers = Check_all_the_ing_after_refill(ing, prod, num);
-
-						if (ing_pointers != NULL) {
-
-
-							delivery_truck = Prepare_the_order(wait_list_tmp->next, delivery_truck);
-
-							WAIT_LIST* free_wait_list = wait_list_tmp->next;
-							wait_list_tmp->next = wait_list->next->next;
-
-							free(free_wait_list);
-
-						}
-						wait_list_tmp = wait_list_tmp->next;
 					}
+
+				} while (wait_list != NULL && ing_pointers != NULL);
+			}
+			if (wait_list != NULL) {
+				ING_POINTER* ing_pointers = NULL;
+				WAIT_LIST* wait_list_tmp_next = wait_list->next;
+				WAIT_LIST* wait_list_tmp = wait_list;
+				prod;
+				while (wait_list_tmp_next != NULL) {
+
+					ing_pointers = NULL;
+					INGREDIENT* ing = wait_list_tmp_next->order_pointer->recipe->ingredient;
+					int num = wait_list_tmp_next->quantity;
+
+					ing_pointers = Check_all_the_ing_after_refill(ing, prod, num);
+
+					if (ing_pointers != NULL) {
+
+						wait_list_tmp_next->order_pointer->ing_pointer = ing_pointers;
+						delivery_truck = Prepare_the_order(wait_list_tmp_next, delivery_truck);
+
+						WAIT_LIST* free_wait_list = wait_list_tmp_next;
+
+						wait_list_tmp->next = wait_list_tmp_next->next;
+						wait_list_tmp_next = wait_list_tmp_next->next;
+
+						free(free_wait_list);
+
+					}
+					else {
+						wait_list_tmp = wait_list_tmp_next;
+						wait_list_tmp_next = wait_list_tmp_next->next;
+					}
+
+
 				}
 			}
+
+
 			printf("rifornito\n");
 		}
 		else if (strcmp(key_menu, "ordine") == 0)			// ordine
@@ -843,7 +961,7 @@ int main() {
 
 			order_pointers = Check_ing_for_order(recipes, prod, name, number);
 
-
+			
 			if (order_pointers != NULL) { // if != NULL im shure that at least the Recipe exist
 
 
@@ -852,24 +970,28 @@ int main() {
 				new_wait_list->order_pointer = order_pointers;
 				new_wait_list->time = program_clock;
 				new_wait_list->quantity = number;
-
+				new_wait_list->next = NULL;
 				if (order_pointers->ing_pointer != NULL) {
 					// delivery_truck
 					delivery_truck = Prepare_the_order(new_wait_list, delivery_truck);
 					free(new_wait_list);//delete the temporari storing
 
-
-
 				}
 				else {
-					// wait_list
-					new_wait_list->next = wait_list;
-					wait_list = new_wait_list;
+					if (wait_list == NULL) {
+						wait_list = new_wait_list;
+						wait_list_tail = wait_list;
+					}
+					else {
+						// wait_list
+						wait_list_tail->next = new_wait_list;
+						wait_list_tail = new_wait_list;
+					}
 				}
-				printf("Accettato\n");
+				printf("accettato\n");
 			}
 			else
-				printf("Rifiutato\n");
+				printf("rifiutato\n");
 
 
 		}
