@@ -1,2 +1,142 @@
 ﻿  main.c
-  Project.vcxproj -> C:\Users\thomm\Desktop\Project\API_Project\Project\x64\Debug\Project.exe
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(54,2): error C2061: syntax error: identifier 'ITEM_QUEUE'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(56,1): error C2059: syntax error: '}'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(60,2): error C2061: syntax error: identifier 'ING_POINTER'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(61,1): error C2059: syntax error: '}'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(64,2): error C2061: syntax error: identifier 'ORDER_POINTERS'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(67,25): error C2371: 'next': redefinition; different basic types
+      C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(55,27):
+      see declaration of 'next'
+  
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(68,1): error C2059: syntax error: '}'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(131,30): warning C4047: 'function': 'const char *' differs in levels of indirection from 'char **'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(131,30): warning C4024: 'strcmp': different types for formal and actual parameter 2
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(133,21): warning C4013: 'Sort_the_item' undefined; assuming extern returning int
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(133,19): warning C4047: '=': 'ITEM *' differs in levels of indirection from 'int'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(137,31): warning C4047: 'function': 'const char *' differs in levels of indirection from 'char **'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(137,31): warning C4024: 'strcmp': different types for formal and actual parameter 2
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(139,51): warning C4047: 'function': 'char *' differs in levels of indirection from 'char **'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(139,51): warning C4024: 'Create_Child_node': different types for formal and actual parameter 1
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(148,51): warning C4047: 'function': 'char *' differs in levels of indirection from 'char **'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(148,51): warning C4024: 'Create_Child_node': different types for formal and actual parameter 1
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(246,26): error C2143: syntax error: missing ')' before '*'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(246,26): error C2143: syntax error: missing '{' before '*'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(246,37): error C2371: 'ITEM': redefinition; different basic types
+      C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(32,2):
+      see declaration of 'ITEM'
+  
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(246,41): error C2143: syntax error: missing ';' before '*'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(246,51): error C2059: syntax error: ')'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(246,43): error C2054: expected '(' to follow 'new_item'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(277,11): error C2143: syntax error: missing '{' before '*'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(277,52): error C2143: syntax error: missing ')' before '*'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(277,52): error C2143: syntax error: missing '{' before '*'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(277,60): error C2059: syntax error: 'type'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(277,77): error C2059: syntax error: ')'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(345,12): error C2143: syntax error: missing '{' before '*'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(345,57): error C2143: syntax error: missing ')' before '*'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(345,57): error C2143: syntax error: missing '{' before '*'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(345,76): error C2059: syntax error: ')'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(345,59): error C2054: expected '(' to follow 'order_ing_pointer'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(354,12): error C2143: syntax error: missing '{' before '*'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(354,72): error C2143: syntax error: missing ')' before '*'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(354,62): error C2081: 'ITEM_QUEUE': name in formal parameter list illegal
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(354,72): error C2143: syntax error: missing '{' before '*'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(354,83): error C2059: syntax error: 'type'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(354,90): error C2059: syntax error: ')'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(436,33): error C2143: syntax error: missing ')' before '*'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(436,33): error C2143: syntax error: missing '{' before '*'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(436,46): error C2059: syntax error: 'type'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(436,60): error C2059: syntax error: ')'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(458,15): error C2143: syntax error: missing '{' before '*'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(458,63): error C2143: syntax error: missing ')' before '*'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(458,53): error C2081: 'ITEM_QUEUE': name in formal parameter list illegal
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(458,63): error C2143: syntax error: missing '{' before '*'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(458,74): error C2059: syntax error: 'type'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(458,97): error C2059: syntax error: ')'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(540,44): error C2143: syntax error: missing ')' before '*'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(540,44): error C2143: syntax error: missing '{' before '*'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(540,58): error C2371: 'DELIVERY_TRUCK': redefinition; different basic types
+      C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(76,2):
+      see declaration of 'DELIVERY_TRUCK'
+  
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(540,72): error C2143: syntax error: missing ';' before '*'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(540,88): error C2059: syntax error: ')'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(540,74): error C2054: expected '(' to follow 'delivery_truck'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(621,2): error C2065: 'WAIT_LIST': undeclared identifier
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(621,11): error C2297: '*': not valid as right operand has type 'int *'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(622,2): error C2065: 'WAIT_LIST': undeclared identifier
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(622,13): error C2065: 'wait_list_tail': undeclared identifier
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(622,28): warning C4047: '=': 'int' differs in levels of indirection from 'void *'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(622,11): error C2106: '=': left operand must be l-value
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(731,12): warning C4013: 'Check_if_somethink_is_rotten' undefined; assuming extern returning int
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(731,10): warning C4047: '=': 'int *' differs in levels of indirection from 'int'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(876,24): warning C4013: 'Find_in_WaitList' undefined; assuming extern returning int
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(946,28): warning C4047: 'function': 'char **' differs in levels of indirection from 'char [256]'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(946,28): warning C4024: 'Sort_new_prod': different types for formal and actual parameter 2
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(958,6): error C2065: 'WAIT_LIST': undeclared identifier
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(958,17): error C2065: 'iterator': undeclared identifier
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(958,26): warning C4047: '=': 'int' differs in levels of indirection from 'int *'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(958,15): error C2106: '=': left operand must be l-value
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(959,6): error C2065: 'WAIT_LIST': undeclared identifier
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(959,17): error C2065: 'last_blocked': undeclared identifier
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(959,30): warning C4047: '=': 'int' differs in levels of indirection from 'void *'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(959,15): error C2106: '=': left operand must be l-value
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(961,13): error C2065: 'iterator': undeclared identifier
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(961,22): warning C4047: '!=': 'int' differs in levels of indirection from 'void *'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(963,11): error C2065: 'iterator': undeclared identifier
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(963,21): error C2223: left of '->next' must point to struct/union
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(964,8): error C2065: 'wait_list_tail': undeclared identifier
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(964,25): error C2065: 'iterator': undeclared identifier
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(966,25): error C2065: 'iterator': undeclared identifier
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(966,35): error C2223: left of '->order_pointer' must point to struct/union
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(967,7): error C2065: 'ING_POINTER': undeclared identifier
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(967,20): error C2065: 'ing_pointers': undeclared identifier
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(967,33): warning C4047: '=': 'int' differs in levels of indirection from 'void *'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(967,18): error C2106: '=': left operand must be l-value
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(968,17): error C2065: 'iterator': undeclared identifier
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(968,27): error C2223: left of '->quantity' must point to struct/union
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(969,7): error C2065: 'ing_pointers': undeclared identifier
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(969,22): warning C4013: 'Check_all_the_ing_after_refill' undefined; assuming extern returning int
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(971,11): error C2065: 'ing_pointers': undeclared identifier
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(971,24): warning C4047: '!=': 'int' differs in levels of indirection from 'void *'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(973,8): error C2065: 'iterator': undeclared identifier
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(973,18): error C2223: left of '->order_pointer' must point to struct/union
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(973,47): error C2065: 'ing_pointers': undeclared identifier
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(974,25): warning C4013: 'Prepare_the_order' undefined; assuming extern returning int
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(974,43): error C2065: 'iterator': undeclared identifier
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(974,23): warning C4047: '=': 'DELIVERY_TRUCK *' differs in levels of indirection from 'int'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(976,8): error C2065: 'WAIT_LIST': undeclared identifier
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(976,19): error C2065: 'free_wait_list': undeclared identifier
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(976,36): error C2065: 'iterator': undeclared identifier
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(976,17): error C2106: '=': left operand must be l-value
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(977,8): error C2065: 'iterator': undeclared identifier
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(977,19): error C2065: 'iterator': undeclared identifier
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(977,29): error C2223: left of '->next' must point to struct/union
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(978,12): error C2065: 'last_blocked': undeclared identifier
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(978,25): warning C4047: '==': 'int' differs in levels of indirection from 'void *'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(979,21): error C2065: 'iterator': undeclared identifier
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(979,19): warning C4047: '=': 'int *' differs in levels of indirection from 'int'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(982,9): error C2065: 'last_blocked': undeclared identifier
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(982,23): error C2223: left of '->next' must point to struct/union
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(982,30): error C2065: 'iterator': undeclared identifier
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(984,13): error C2065: 'free_wait_list': undeclared identifier
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(984,13): warning C4022: 'free': pointer mismatch for actual parameter 1
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(989,8): error C2065: 'last_blocked': undeclared identifier
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(989,23): error C2065: 'iterator': undeclared identifier
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(990,8): error C2065: 'iterator': undeclared identifier
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(990,19): error C2065: 'iterator': undeclared identifier
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(990,29): error C2223: left of '->next' must point to struct/union
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(1006,3): error C2059: syntax error: 'else'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(1010,35): error C2065: 'number': undeclared identifier
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(1013,4): error C2065: 'ORDER_POINTERS': undeclared identifier
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(1013,20): error C2065: 'order_pointers': undeclared identifier
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(1013,35): warning C4047: '=': 'int' differs in levels of indirection from 'void *'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(1013,18): error C2106: '=': left operand must be l-value
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(1015,4): error C2065: 'order_pointers': undeclared identifier
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(1015,21): warning C4013: 'Check_ing_for_order' undefined; assuming extern returning int
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(1015,62): error C2065: 'number': undeclared identifier
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(1018,8): error C2065: 'order_pointers': undeclared identifier
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(1018,23): warning C4047: '!=': 'int' differs in levels of indirection from 'void *'
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(1021,5): error C2065: 'WAIT_LIST': undeclared identifier
+C:\Users\thomm\Desktop\Project\API_Project\Project\Project\main.c(1021,5): error C1003: error count exceeds 100; stopping compilation
