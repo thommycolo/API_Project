@@ -19,11 +19,12 @@ typedef struct ing_node {
 	struct ing_node* next;
 }INGREDIENT;
 
-typedef struct rec_node {
+typedef struct recipe_tree_node {
 	char name[LEN];
 	INGREDIENT* ingredient;
-	struct rec_node* next;
-}RECIPE;
+	struct recipe_tree_node* left;
+	struct recipe_tree_node* right;
+}RECIPE_TREE_NODE;
 
 typedef struct item_node {
 	int quantity;
@@ -51,12 +52,12 @@ typedef struct prod_tree_node {
 
 
 typedef struct ing_pointer_node {
-	ITEM_QUEUE* recipe_ingredients;
+	PROD_TREE_NODE* recipe_ingredients;
 	struct ing_pointer_node* next;
 }ING_POINTER;
 
 typedef struct order_pointers_node {
-	RECIPE* recipe;
+	RECIPE_TREE* recipe;
 	ING_POINTER* ing_pointer;
 }ORDER_POINTERS;
 
@@ -79,7 +80,7 @@ typedef struct delivery_truck_node {
 // Function declaring
 
 
-PROD_TREE_NODE* Create_Child_node(char* name, ITEM* item) {
+PROD_TREE_NODE* Create_prod_child_node(char* name, ITEM* item) {
 
 	PROD_TREE_NODE* new_node = (PROD_TREE_NODE*)malloc(sizeof(PROD_TREE_NODE));
 	if (new_node != NULL) {
@@ -91,8 +92,28 @@ PROD_TREE_NODE* Create_Child_node(char* name, ITEM* item) {
 	}
 	return new_node;
 }
+INGREDIENT* Create_new_ingredient(char* name, int quantity) {
+	INGREDIENT* ing = (INGREDIENT*)malloc(sizeof(INGREDIENT));
+	strcpy(ing->name, name);
+	ing->quantity = quantity;
+	ing->next = NULL;
+	return ing;
+}
 
-ITEM* Sort_the_itrem(ITEM* item, ITEM* new_item) {
+RECIPE_TREE_NODE* Create_recipe_child_node(char* name, INGREDIENT* ingredient) {
+	RECIPE_TREE_NODE* new_node = (PROD_TREE_NODE*)malloc(sizeof(PROD_TREE_NODE));
+	if (new_node != NULL) {
+
+		strcpy(new_node->name, name);
+		new_node->ingredient = ingredient;
+		new_node->left = NULL;
+		new_node->right = NULL;
+	}
+	return new_node;
+
+}
+
+ITEM* Sort_the_item(ITEM* item, ITEM* new_item) {
 
 	ITEM* item_iterator = item;
 	bool sorted = false;
@@ -122,9 +143,9 @@ ITEM* Sort_the_itrem(ITEM* item, ITEM* new_item) {
 }
 
 
-void Sort_new_prod(PROD_TREE_NODE* root, char* name[LEN], ITEM* new_item) {
+void Sort_new_prod(PROD_TREE_NODE* prod_root, char* name[LEN], ITEM* new_item) {
 	bool sorted = false;
-	PROD_TREE_NODE* treenode = root;
+	PROD_TREE_NODE* treenode = prod_root;
 
 	while (sorted != true) {
 
@@ -161,23 +182,46 @@ void Sort_new_prod(PROD_TREE_NODE* root, char* name[LEN], ITEM* new_item) {
 }
 
 
+bool Sort_new_recipe(RECIPE_TREE_NODE* recipe_root, RECIPE_TREE_NODE* recipe_tmp) {
 
-bool Find(char* name, RECIPE* pointer) {
-	bool find = false;
-	//if (pointer->next != NULL) {
-	while (pointer != NULL) {
-
-		if (strcmp(pointer->name, name) == 0)
-		{
-			find = true;
-			break;
+	RECIPE_TREE_NODE* treenode = recipe_root;
+	bool sorted = false;
+	while (sorted != true) {
+		if (strcmp(treenode->name, recipe_tmp->name) == 0) {
+			free(recipe_tmp);
+			sorted = true;
+			return true;// recipe was already existing
 		}
-		pointer = pointer->next;
-	}
-	//}
+		else {// recipe_tmp is bigger than treenode
+			if (strcmp(treenode->name, recipe_tmp->name) > 0) {
+				if (treenode->right == NULL) {
+					treenode->right = recipe_tmp;
+					sorted = true;
+					return false; // recipe wasn't already existing
+				}
+				else
+					treenode = treenode->right;
+			}
+			else { // recipe_tmp is smaller than treenode
 
-	return find;
+				if (treenode->left == NULL) {
+					treenode->left = recipe_tmp;
+					sorted = true;
+					return false; // recipe wasn't already existing
+				}
+				else
+					treenode = treenode->left;
+
+			}
+
+		}
+
+	}
+
 }
+
+
+
 
 int Contacifre(int n) {
 	int count = 0;
@@ -242,104 +286,6 @@ char* Chop_two_int(char* phrase, int num1, int num2) {
 	return phrase;
 }
 
-
-ITEM* Add_item(ITEM_QUEUE* storage, ITEM* new_item) {
-	if (storage->item->decay > new_item->decay) {
-		new_item->next = storage->item;
-		storage->item = new_item;
-	}
-	else {
-		bool sort = false;
-		ITEM* tmp = storage->item;
-		while (sort == false) {
-			//
-			if (tmp->next != NULL && tmp->next->decay > new_item->decay) {
-				new_item->next = tmp->next;
-				tmp->next = new_item;
-				sort = true;
-			}
-			else {
-
-				if (tmp->next == NULL) {
-					new_item->next = NULL;
-					tmp->next = new_item;
-					new_item = tmp;
-					sort = true;
-				}
-				else
-					tmp = tmp->next;
-			}
-		}
-	}
-	return storage->item;
-}
-
-ITEM_QUEUE* Check_if_somethink_is_rotten(ITEM_QUEUE* prod, int program_clock) {
-
-	if (prod != NULL) {
-		//ITEM_QUEUE* prod_next = prod->next;
-		if (prod->next == NULL) { // if there is only 1 element in prod
-			//ITEM* item_tmp = check_storage->item;
-			while (prod->item != NULL && prod->item->decay <= program_clock)
-			{
-				ITEM* tmp = prod->item;
-				prod->item = prod->item->next;
-				free(tmp);
-			}
-			if (prod->item == NULL) {
-				free(prod);
-				prod = NULL;
-			}
-		}
-		else if (prod->item == NULL) {
-
-			while (prod != NULL && prod->item == NULL) {
-
-				if (prod->item == NULL) {
-					while (prod->item != NULL) {
-						ITEM* tmp = prod->next->item;
-						prod->next->item = prod->next->item->next;
-						free(tmp);
-					}
-					if (prod->item == NULL) {
-						ITEM_QUEUE* storage_tmp = prod;
-						prod = prod->next;
-						free(storage_tmp);
-					}
-				}
-			}
-
-		}
-		else {
-			ITEM_QUEUE* prod_tmp = prod;
-			while (prod_tmp != NULL) {// if there at least 2 element in prod
-
-				//ITEM* item_tmp = check_storage->next->item;
-				if (prod_tmp->next != NULL) {
-					while (prod_tmp->next->item != NULL && prod_tmp->next->item->decay <= program_clock)
-					{
-						ITEM* tmp = prod_tmp->next->item;
-						prod_tmp->next->item = prod_tmp->next->item->next;
-						free(tmp);
-					}
-					if (prod_tmp->next->item == NULL) {
-						ITEM_QUEUE* storage_tmp = prod_tmp->next;
-						prod_tmp->next = prod_tmp->next->next;
-						prod_tmp = prod_tmp->next;
-						free(storage_tmp);
-					}
-					else
-						prod_tmp = prod_tmp->next;
-				}
-				else {
-					prod_tmp = prod_tmp->next;
-				}
-			}
-		}
-	}
-
-	return prod;
-}
 
 
 ING_POINTER* Delete_ingredient_from_research(ING_POINTER* order_ing_pointer) {
@@ -455,7 +401,7 @@ bool Find_in_Delivery_truck(DELIVERY_TRUCK* delivery_truck, char name[LEN]) {
 
 }
 
-ORDER_POINTERS* Check_ing_for_order(RECIPE* recipe, ITEM_QUEUE* storage, char name[LEN], int num) {
+ORDER_POINTERS* Check_ing_for_order(RECIPE* recipe, PROD_TREE_NODE* prod_root, char name[LEN], int num) {
 	// check if the recipe and the ingredient are ok for making the order.
 
 	ORDER_POINTERS* order_pointers = NULL;
@@ -601,6 +547,9 @@ DELIVERY_TRUCK* Copy_truck_value(DELIVERY_TRUCK* delivery_truck) {
 	return loading_queue;
 }
 
+
+
+
 int main() {
 	/*
 		// Inizia a misurare il tempo
@@ -609,12 +558,12 @@ int main() {
 
 
 	// recipes list
-	RECIPE* recipes = NULL;
-	RECIPE* new_recipe = NULL;
+	RECIPE_TREE_NODE* recipe_root = NULL;
+
 	int rec_counter = 0;
 
 	// PROD_TREE list
-	PROD_TREE_NODE* root = NULL;
+	PROD_TREE_NODE* prod_root = NULL;
 
 
 	// order in wait list
@@ -728,7 +677,7 @@ int main() {
 
 				// check if something went rotten
 
-				prod = Check_if_somethink_is_rotten(prod, program_clock);
+				prod_root = Check_if_somethink_is_rotten(prod_root, program_clock);
 
 
 
@@ -747,123 +696,61 @@ int main() {
 					//*buffer = Chop_word(buffer, name);
 					strcpy(buffer, bebbo);
 
+					INGREDIENT* ing = NULL;
 
-					if (recipes != NULL && Find(name, recipes) == true)
-						printf("ignorato\n");
-					else {
-						INGREDIENT* ing_head = NULL;
-						INGREDIENT* new_ing = NULL;
-						new_ing = NULL;
+					while (buffer != '\n') {
+						char ing_name[LEN];
+						int quantity;
 
+						sscanf(buffer, "%s %d", ing_name, &quantity);
+						bebbo = Chop_word_int(buffer, ing_name, quantity);
+						if (bebbo == NULL)
+							buffer[0] = '\n';
+						else
+							strcpy(buffer, bebbo);
 
-						new_recipe = (RECIPE*)malloc(sizeof(RECIPE));
-
-						strcpy(new_recipe->name, name);
-
-						while (buffer[0] != '\n')
-						{
-
-							new_ing = (INGREDIENT*)malloc(sizeof(INGREDIENT));
-							new_ing->next = NULL;
-							sscanf(buffer, "%s %d", new_ing->name, &new_ing->quantity);
-
-							if (ing_head == NULL) {
-								new_ing->next = ing_head;
-								ing_head = new_ing;
-							}
-							else if (ing_head != NULL && ing_head->next == NULL) {
-								if (strcmp(new_ing->name, ing_head->name) < 0) {
-									new_ing->next = ing_head;
-									ing_head = new_ing;
-								}
-								else {
-									ing_head->next = new_ing;
-								}
-							}
-							else if (strcmp(new_ing->name, ing_head->name) < 0) {
-								new_ing->next = ing_head;
-								ing_head = new_ing;
-							}
-							else {
-								bool sorted = false;
-								INGREDIENT* ing_tmp = ing_head;
-								while (sorted != true) {
-
-									if (ing_tmp->next == NULL) {
-										ing_tmp->next = new_ing;
-										sorted = true;
-									}
-									else {
-										if (strcmp(new_ing->name, ing_tmp->next->name) < 0) {
-											new_ing->next = ing_tmp->next;
-											ing_tmp->next = new_ing;
-											sorted = true;
-										}
-										else
-											ing_tmp = ing_tmp->next;
-									}
-
-
-								}
-							}
-
-							bebbo = Chop_word_int(buffer, new_ing->name, new_ing->quantity);
-							if (bebbo == NULL)
-								buffer[0] = '\n';
-							else
-								strcpy(buffer, bebbo);
-
-						}
-						new_recipe->ingredient = ing_head;
-						new_recipe->next = NULL;
-
-						if (recipes == NULL) {
-							recipes = new_recipe;
-						}
-						else if (recipes->next == NULL) {
-							if (strcmp(recipes->name, new_recipe->name) > 0) {
-								new_recipe->next = recipes;
-								recipes = new_recipe;
-							}
-							else
-								recipes->next = new_recipe;
+						// creting a temporary recipe
+						INGREDIENT* new_ing = Create_new_ingredient(name, quantity);
+						if (ing = NULL) {
+							ing = new_ing;
 						}
 						else {
-							bool sorted = false;
-							RECIPE* recipe_tmp = recipes;
-							while (sorted != true) {
-								if (recipe_tmp->next == NULL) {
-									if (strcmp(recipe_tmp->name, new_recipe->name) > 0) {
-										new_recipe->next = recipe_tmp->next;
-										recipe_tmp->next = new_recipe;
-										sorted = true;
-									}
-									else {
-										recipe_tmp->next = new_recipe;
-										sorted = true;
-									}
-
-								}
-								if (strcmp(recipe_tmp->next->name, new_recipe->name) > 0) {
-									new_recipe->next = recipe_tmp->next;
-									recipe_tmp->next = new_recipe;
-									sorted = true;
-								}
-								else
-									recipe_tmp = recipe_tmp->next;
-
-							}
-
+							ing->next = new_ing;
+							ing = new_ing;
 						}
 
+					}
+
+					RECIPE_TREE_NODE* recipe_tmp = Create_recipe_child_node(name, ing);
 
 
+					if (recipe_root == NULL) {
 
-						printf("aggiunta\n");
-						rec_counter++;
+						recipe_root = recipe_tmp;
 
 					}
+					else {
+
+						bool is_already_existing = Sort_new_recipe(recipe_root, recipe_tmp);
+
+						if (is_already_existing == true) {
+							printf("ignorato\n");
+						}
+						else {
+							printf("aggiunta\n");
+						}
+					}
+
+
+
+
+
+					//new_ing = Sort_ingredient(iterator->ingredient, new_ing);
+
 				}
+
+
+
 				else if (strcmp(key_menu, "rimuovi_ricetta") == 0)	// rimuovi ricetta
 				{
 
@@ -929,6 +816,8 @@ int main() {
 						sscanf(buffer, "%d %d", &new_item->quantity, &new_item->decay);
 						new_item->next = NULL;
 
+						bebbo = Chop_two_int(buffer, new_item->quantity, new_item->decay);
+
 						if (bebbo == NULL)
 							buffer[0] = '\n';
 						else
@@ -936,14 +825,14 @@ int main() {
 
 
 
-						if (root == NULL) { // if the Prod_tree is empty i create the root
+						if (prod_root == NULL) { // if the Prod_tree is empty i create the prod_root
 
-							//root->item = Sort_new_prod_item(root->item, new_item);
-							root = Create_Child_node(tmp_name, new_item);
+							//prod_root->item = Sort_new_prod_item(prod_root->item, new_item);
+							prod_root = Create_Child_node(tmp_name, new_item);
 						}
 						else {
 
-							Sort_new_prod(root, tmp_name, new_item);
+							Sort_new_prod(prod_root, tmp_name, new_item);
 
 						}
 
@@ -954,6 +843,22 @@ int main() {
 
 				// check if now some order in wait list can be processed
 
+				/*
+				if (wait_list != NULL) {
+					WAIT_LIST* wl_iterator = wait_list;
+
+					while (wl_iterator != NULL) {
+
+
+
+					}
+
+
+				}
+				*/
+
+
+				/*
 				if (wait_list != NULL) {
 					WAIT_LIST* iterator = wait_list;
 					WAIT_LIST* last_blocked = NULL;
@@ -998,7 +903,7 @@ int main() {
 
 				}
 
-
+				*/
 
 
 				printf("rifornito\n");
@@ -1012,7 +917,7 @@ int main() {
 			// struct for saving pointers for the order
 			ORDER_POINTERS* order_pointers = NULL;
 
-			order_pointers = Check_ing_for_order(recipes, prod, name, number);
+			order_pointers = Check_ing_for_order(recipes, prod_root, name, number);
 
 
 			if (order_pointers != NULL) { // if != NULL im shure that at least the Recipe exist
