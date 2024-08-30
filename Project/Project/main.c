@@ -155,7 +155,7 @@ void Sort_new_prod(PROD_TREE_NODE* prod_root, char* name[LEN], ITEM* new_item) {
 			sorted = true;
 		}
 		else {
-			if (strcmp(treenode->name, name) > 0) { // tmp_name is bigger than the father, so i check on his right
+			if (strcmp(treenode->name, name) < 0) { // tmp_name is bigger than the father, so i check on his right
 				if (treenode->right == NULL) {
 					PROD_TREE_NODE* new_node = Create_Child_node(name, new_item);
 					treenode->right = new_node;
@@ -193,7 +193,7 @@ bool Sort_new_recipe(RECIPE_TREE_NODE* recipe_root, RECIPE_TREE_NODE* recipe_tmp
 			return true;// recipe was already existing
 		}
 		else {// recipe_tmp is bigger than treenode
-			if (strcmp(treenode->name, recipe_tmp->name) > 0) {
+			if (strcmp(treenode->name, recipe_tmp->name) < 0) {
 				if (treenode->right == NULL) {
 					treenode->right = recipe_tmp;
 					sorted = true;
@@ -220,6 +220,68 @@ bool Sort_new_recipe(RECIPE_TREE_NODE* recipe_root, RECIPE_TREE_NODE* recipe_tmp
 
 }
 
+RECIPE_TREE_NODE* Find_min_recipe(RECIPE_TREE_NODE* root) {
+	RECIPE_TREE_NODE* treenode = root;
+	if (treenode != NULL) {
+		while (treenode->left != NULL) {
+			treenode = treenode->left;
+		}
+	}
+	return treenode;
+}
+
+
+RECIPE_TREE_NODE* Delete_recipe(RECIPE_TREE_NODE* root, char* name) {
+
+	if (root == NULL) {
+		printf("non presente\n");
+		return root;
+	}
+	else if (strcmp(root->name, name) > 0) {
+		if (root->left != NULL)
+			root->left = Delete_recipe(root->left, name);
+		else {
+			printf("non presente\n");
+		}
+	}
+	else if (strcmp(root->name, name) < 0) {
+		if (root->right != NULL)
+			root->right = Delete_recipe(root->right, name);
+		else {
+			printf("non presente\n");
+		}
+
+	}
+	else {// found the node that need to be deleated
+		
+		if (root->left == NULL && root->right == NULL) { // case 1: no child
+			printf("rimossa\n");
+			free(root);
+			root = NULL;
+		}
+		else if (root->left == NULL) { // case 2: one child [RIGHT]
+			printf("rimossa\n");
+			RECIPE_TREE_NODE* tmp = root;
+			root = root->right;
+			free(tmp);
+		}
+		else if (root->right == NULL) { // case 2: one child [LEFT]
+			printf("rimossa\n");
+			RECIPE_TREE_NODE* tmp = root;
+			root = root->left;
+			free(tmp);
+		}
+		else {// case 3: two child 
+			printf("rimossa\n");
+			RECIPE_TREE_NODE* tmp = Find_min_recipe(root->right);
+			strcpy(root->name, tmp->name);
+			root->ingredient = tmp->ingredient;
+			root->right = Delete_recipe(root->name, tmp->name);
+		}
+
+	}
+	return root;
+}
 
 
 
@@ -754,39 +816,21 @@ int main() {
 				else if (strcmp(key_menu, "rimuovi_ricetta") == 0)	// rimuovi ricetta
 				{
 
-					bool find = false;
-					strcpy(name, "");
+					
 					sscanf(buffer, "%s", name);
-					RECIPE* find_recipe = recipes;
+					bebbo = Chop_word(buffer, name);
+					//*buffer = Chop_word(buffer, name);
+					strcpy(buffer, bebbo);
+					if (bebbo == NULL)
+						buffer[0] = '\n';
+					else
+						strcpy(buffer, bebbo);
 
 
 					bool find_in_ws = Find_in_WaitList(wait_list, name);
 					bool find_in_dt = Find_in_Delivery_truck(delivery_truck, name);
 					if (find_in_ws == false && find_in_dt == false) {
-						if (strcmp(find_recipe->name, name) == 0) {
-							RECIPE* tmp = find_recipe;
-							recipes = find_recipe->next;
-							free(tmp);
-							find = true;
-						}
-						else if (find_recipe->next != NULL) {
-							while (find_recipe->next != NULL) {
-								if (strcmp(find_recipe->next->name, name) == 0) {
-									RECIPE* tmp = find_recipe->next;
-									find_recipe->next = find_recipe->next->next;
-									free(tmp);
-									find = true;
-									break;
-								}
-								else {
-									find_recipe = find_recipe->next;
-								}
-							}
-						}
-						if (find == true)
-							printf("rimossa\n");
-						else
-							printf("non presente\n");
+						recipe_root = Delete_recipe(recipe_root, name);
 					}
 					else {
 						printf("ordini in sospeso\n");

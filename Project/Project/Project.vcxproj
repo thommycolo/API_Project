@@ -128,7 +128,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.c" />
-    <ClCompile Include="test.c" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="input.txt" />
