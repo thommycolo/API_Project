@@ -43,6 +43,7 @@ typedef struct item_queue_node {
 typedef struct prod_tree_node {
 
 	char name[LEN];
+	int quantity_tot;
 	ITEM* item;
 
 	struct prod_tree_node* left; // left if prod->name is smaller than the child
@@ -52,13 +53,13 @@ typedef struct prod_tree_node {
 
 
 typedef struct ing_pointer_node {
-	PROD_TREE_NODE* recipe_ingredients;
+	PROD_TREE_NODE* prod_node;
 	struct ing_pointer_node* next;
-}ING_POINTER;
+}PROD_POINTER;
 
 typedef struct order_pointers_node {
-	RECIPE_TREE* recipe;
-	ING_POINTER* ing_pointer;
+	RECIPE_TREE_NODE* recipe;
+	PROD_POINTER* prod_pointer;
 }ORDER_POINTERS;
 
 typedef struct wait_list_node {
@@ -68,18 +69,25 @@ typedef struct wait_list_node {
 	struct wait_list_node* next;
 }WAIT_LIST;
 
-typedef struct delivery_truck_node {
+typedef struct order_ready_node {
 	char name[LEN];
 	int time;
 	int quantity;
 	int weight;
+	struct order_ready_node* next;
+}ORDER_READY;
+
+typedef struct delivery_truck_node {
+	char name[LEN];
+	int quantity;
+	int time;
+	int weight;
 	struct delivery_truck_node* next;
 }DELIVERY_TRUCK;
 
-
 // Function declaring
 
-
+// ============================ PROD AND ITEM FILLING CREATION =========================
 PROD_TREE_NODE* Create_prod_child_node(char* name, ITEM* item) {
 
 	PROD_TREE_NODE* new_node = (PROD_TREE_NODE*)malloc(sizeof(PROD_TREE_NODE));
@@ -87,30 +95,11 @@ PROD_TREE_NODE* Create_prod_child_node(char* name, ITEM* item) {
 
 		strcpy(new_node->name, name);
 		new_node->item = item;
+		new_node->quantity_tot = item->quantity;
 		new_node->left = NULL;
 		new_node->right = NULL;
 	}
 	return new_node;
-}
-INGREDIENT* Create_new_ingredient(char* name, int quantity) {
-	INGREDIENT* ing = (INGREDIENT*)malloc(sizeof(INGREDIENT));
-	strcpy(ing->name, name);
-	ing->quantity = quantity;
-	ing->next = NULL;
-	return ing;
-}
-
-RECIPE_TREE_NODE* Create_recipe_child_node(char* name, INGREDIENT* ingredient) {
-	RECIPE_TREE_NODE* new_node = (PROD_TREE_NODE*)malloc(sizeof(PROD_TREE_NODE));
-	if (new_node != NULL) {
-
-		strcpy(new_node->name, name);
-		new_node->ingredient = ingredient;
-		new_node->left = NULL;
-		new_node->right = NULL;
-	}
-	return new_node;
-
 }
 
 ITEM* Sort_the_item(ITEM* item, ITEM* new_item) {
@@ -118,14 +107,14 @@ ITEM* Sort_the_item(ITEM* item, ITEM* new_item) {
 	ITEM* item_iterator = item;
 	bool sorted = false;
 
-	if (item->decay > new_item->decay) {
+	if (item->decay > new_item->decay) { // switching the first position if necessary
 		new_item->next = item;
 		item = new_item;
 		sorted = true;
 	}
 	while (sorted != true) {
 
-		if (item_iterator->next == NULL) {
+		if (item_iterator->next == NULL) { // adding in the right position the new item
 			new_item->next = NULL;
 			item_iterator->next = new_item;
 			sorted = true;
@@ -149,15 +138,15 @@ void Sort_new_prod(PROD_TREE_NODE* prod_root, char* name[LEN], ITEM* new_item) {
 
 	while (sorted != true) {
 
-		if (strcmp(treenode->name, name) == 0) { // i've found the prod
-
+		if (strcmp(treenode->name, name) == 0) { // new_prod is alredy existing in prood_root
+			treenode->quantity_tot += new_item->quantity;
 			treenode->item = Sort_the_item(treenode->item, new_item);
 			sorted = true;
 		}
 		else {
 			if (strcmp(treenode->name, name) < 0) { // tmp_name is bigger than the father, so i check on his right
 				if (treenode->right == NULL) {
-					PROD_TREE_NODE* new_node = Create_Child_node(name, new_item);
+					PROD_TREE_NODE* new_node = Create_prod_child_node(name, new_item);// haven't found new_prod in the prod_root so i create a new node
 					treenode->right = new_node;
 					sorted = true;
 				}
@@ -166,7 +155,7 @@ void Sort_new_prod(PROD_TREE_NODE* prod_root, char* name[LEN], ITEM* new_item) {
 			}
 			else { // tmp_name is smaller than the father, so i check on his left
 				if (treenode->left == NULL) {
-					PROD_TREE_NODE* new_node = Create_Child_node(name, new_item);
+					PROD_TREE_NODE* new_node = Create_prod_child_node(name, new_item);// haven't found new_prod in the prod_root so i create a new node
 					treenode->left = new_node;
 					sorted = true;
 				}
@@ -181,7 +170,7 @@ void Sort_new_prod(PROD_TREE_NODE* prod_root, char* name[LEN], ITEM* new_item) {
 
 }
 
-
+// ============================ RECIPE CHILD CREATION ==================================
 bool Sort_new_recipe(RECIPE_TREE_NODE* recipe_root, RECIPE_TREE_NODE* recipe_tmp) {
 
 	RECIPE_TREE_NODE* treenode = recipe_root;
@@ -219,72 +208,29 @@ bool Sort_new_recipe(RECIPE_TREE_NODE* recipe_root, RECIPE_TREE_NODE* recipe_tmp
 	}
 
 }
+INGREDIENT* Create_new_ingredient(char* name, int quantity) {
+	INGREDIENT* ing = (INGREDIENT*)malloc(sizeof(INGREDIENT));
+	strcpy(ing->name, name);
+	ing->quantity = quantity;
+	ing->next = NULL;
+	return ing;
+}
 
-RECIPE_TREE_NODE* Find_min_recipe(RECIPE_TREE_NODE* root) {
-	RECIPE_TREE_NODE* treenode = root;
-	if (treenode != NULL) {
-		while (treenode->left != NULL) {
-			treenode = treenode->left;
-		}
+RECIPE_TREE_NODE* Create_recipe_child_node(char* name, INGREDIENT* ingredient) {
+	RECIPE_TREE_NODE* new_node = (PROD_TREE_NODE*)malloc(sizeof(PROD_TREE_NODE));
+	if (new_node != NULL) {
+
+		strcpy(new_node->name, name);
+		new_node->ingredient = ingredient;
+		new_node->left = NULL;
+		new_node->right = NULL;
 	}
-	return treenode;
+	return new_node;
+
 }
 
 
-RECIPE_TREE_NODE* Delete_recipe(RECIPE_TREE_NODE* root, char* name) {
-
-	if (root == NULL) {
-		printf("non presente\n");
-		return root;
-	}
-	else if (strcmp(root->name, name) > 0) {
-		if (root->left != NULL)
-			root->left = Delete_recipe(root->left, name);
-		else {
-			printf("non presente\n");
-		}
-	}
-	else if (strcmp(root->name, name) < 0) {
-		if (root->right != NULL)
-			root->right = Delete_recipe(root->right, name);
-		else {
-			printf("non presente\n");
-		}
-
-	}
-	else {// found the node that need to be deleated
-		
-		if (root->left == NULL && root->right == NULL) { // case 1: no child
-			printf("rimossa\n");
-			free(root);
-			root = NULL;
-		}
-		else if (root->left == NULL) { // case 2: one child [RIGHT]
-			printf("rimossa\n");
-			RECIPE_TREE_NODE* tmp = root;
-			root = root->right;
-			free(tmp);
-		}
-		else if (root->right == NULL) { // case 2: one child [LEFT]
-			printf("rimossa\n");
-			RECIPE_TREE_NODE* tmp = root;
-			root = root->left;
-			free(tmp);
-		}
-		else {// case 3: two child 
-			printf("rimossa\n");
-			RECIPE_TREE_NODE* tmp = Find_min_recipe(root->right);
-			strcpy(root->name, tmp->name);
-			root->ingredient = tmp->ingredient;
-			root->right = Delete_recipe(root->name, tmp->name);
-		}
-
-	}
-	return root;
-}
-
-
-
+//============================== FUNCTION FOR BUFFER MANIPULATION ======================
 int Contacifre(int n) {
 	int count = 0;
 	while (n > 0) {
@@ -350,98 +296,102 @@ char* Chop_two_int(char* phrase, int num1, int num2) {
 
 
 
-ING_POINTER* Delete_ingredient_from_research(ING_POINTER* order_ing_pointer) {
-	while (order_ing_pointer != NULL) {
-		ING_POINTER* tmp = order_ing_pointer;
-		order_ing_pointer = order_ing_pointer->next;
-		free(tmp);
-	}
-	return NULL;
-}
 
-ING_POINTER* Check_all_the_ing_after_refill(INGREDIENT* ing, ITEM_QUEUE* storage, int num) {
 
-	ING_POINTER* order_ing_pointer = NULL;
-	ING_POINTER* order_ing_pointer_tail = NULL;
+// ============================= CHECK INGRENDIENT FOR ORDER / WAIT LIST ================
 
-	bool not_enough_item = false;
 
-	while (ing != NULL && storage != NULL && not_enough_item != true) {
-		bool find_ingredient = false;
-		if (strcmp(ing->name, storage->name) == 0) { // check if all the ingredients are enough and if so save the head
-			find_ingredient = true;
+RECIPE_TREE_NODE* Check_recipe_for_order(RECIPE_TREE_NODE* recipe_root, char* name) {
+	bool find = false;
 
-			int tot = ing->quantity * num;
+	if (recipe_root != NULL) {
+		while (recipe_root != NULL && find != true) {
 
-			if (storage->item != NULL) {
-				if (tot > storage->item->quantity) {
-
-					ITEM* item_list = storage->item;
-					while (tot > 0 && item_list != NULL) {
-						tot -= item_list->quantity;
-						if (tot > 0) {
-							item_list = item_list->next;
-						}
-					}
-					if (item_list != NULL) {
-						ING_POINTER* new_order_ing_pointer = (ING_POINTER*)malloc(sizeof(ING_POINTER));
-						new_order_ing_pointer->recipe_ingredients = storage;
-						if (order_ing_pointer == NULL) {
-							new_order_ing_pointer->next = NULL;
-							order_ing_pointer = new_order_ing_pointer;
-							order_ing_pointer_tail = order_ing_pointer;
-						}
-						else {
-							new_order_ing_pointer->next = NULL;
-							order_ing_pointer_tail->next = new_order_ing_pointer;
-							order_ing_pointer_tail = new_order_ing_pointer;
-						}
-					}
-					else {
-						order_ing_pointer = Delete_ingredient_from_research(order_ing_pointer);
-						not_enough_item = true;
-					}
-				}
-				else if (tot <= storage->item->quantity) {
-					ING_POINTER* new_order_ing_pointer = (ING_POINTER*)malloc(sizeof(ING_POINTER));
-					new_order_ing_pointer->recipe_ingredients = storage;
-
-					if (order_ing_pointer == NULL) {
-						new_order_ing_pointer->next = NULL;
-						order_ing_pointer = new_order_ing_pointer;
-						order_ing_pointer_tail = order_ing_pointer;
-					}
-					else {
-						new_order_ing_pointer->next = NULL;
-						order_ing_pointer_tail->next = new_order_ing_pointer;
-						order_ing_pointer_tail = new_order_ing_pointer;
-					}
-				}
-				storage = storage->next;
-				ing = ing->next;
+			if (strcmp(recipe_root->name, name) == 0) { // i've found the recipe
+				find = true;
 			}
 			else {
-				order_ing_pointer = Delete_ingredient_from_research(order_ing_pointer);
-				not_enough_item = true;
+				if (strcmp(recipe_root->name, name) < 0) { // tmp_name is bigger than the father, so i check on his right
+					recipe_root = recipe_root->right;
+				}
+				else { // tmp_name is smaller than the father, so i check on his left
+					recipe_root = recipe_root->left;
+				}
+			}
+		}
+	}
+	return recipe_root;
+}
+
+PROD_TREE_NODE* Find_prod(PROD_TREE_NODE* prod_root, char* name, int quantity_tot) {
+	bool find = false;
+
+	if (prod_root != NULL) {
+		while (prod_root != NULL && find != true) {
+
+			if (strcmp(prod_root->name, name) == 0) { // i've found the prod
+				if (prod_root->quantity_tot >= quantity_tot) // Check if there is enough item in storage to perform the order
+					find = true;
+				else
+					return NULL;
+			}
+			else {
+				if (strcmp(prod_root->name, name) < 0) { // tmp_name is bigger than the father, so i check on his right
+					prod_root = prod_root->right;
+				}
+				else { // tmp_name is smaller than the father, so i check on his left
+					prod_root = prod_root->left;
+				}
+			}
+		}
+	}
+	return prod_root;
+}
+
+void Delete_all_tmp_ing_pointer(PROD_POINTER* ing_pointer) {
+	while (ing_pointer != NULL) {
+		PROD_POINTER* tmp = ing_pointer;
+		ing_pointer = ing_pointer->next;
+		free(tmp);
+	}
+
+}
+
+PROD_POINTER* Check_ing_for_order(INGREDIENT* rec_ingredient, PROD_TREE_NODE* prod_root, int number) {
+	PROD_POINTER* prod_pointer = NULL;
+	PROD_POINTER* prod_pointer_tail = prod_pointer;
+
+	while (rec_ingredient != NULL) {
+		int quantity_tot = rec_ingredient->quantity * number;// is the total amount of item necessary
+		PROD_TREE_NODE* prod_tmp = Find_prod(prod_root, rec_ingredient->name, quantity_tot); // find the prod and if there is enough item in storage
+
+		if (prod_tmp != NULL) {
+			PROD_POINTER* new_prod_pointer = (PROD_POINTER*)malloc(sizeof(PROD_POINTER));
+			new_prod_pointer->next = NULL;
+			new_prod_pointer->prod_node = prod_tmp;
+			if (prod_pointer == NULL) {
+				prod_pointer = new_prod_pointer;
+				prod_pointer_tail = prod_pointer;
+			}
+			else {
+				prod_pointer_tail->next = new_prod_pointer;
+				prod_pointer_tail = new_prod_pointer;
 			}
 		}
 		else {
-			if (find_ingredient == false) {
-				storage = storage->next;
-				if (storage == NULL || strcmp(ing->name, storage->name) < 0) {
-					order_ing_pointer = Delete_ingredient_from_research(order_ing_pointer);
-					not_enough_item = true;
-				}
-			}
+			Delete_all_tmp_ing_pointer(prod_pointer);// delete all the ing pointer that i found
+			return NULL;
 		}
+
+		rec_ingredient = rec_ingredient->next;
 	}
 
-	return order_ing_pointer;
-
+	return prod_pointer;
 }
 
+// =============================== FIND FOR REMOVING RECIPE ==============================
 
-bool  Find_in_WaitList(WAIT_LIST* wait_list, char name[LEN]) {
+bool  Find_in_WaitList(WAIT_LIST* wait_list, char* name) {
 	bool find = false;
 	while (wait_list != NULL && find == false) {
 		if (strcmp(wait_list->order_pointer->recipe->name, name) == 0)
@@ -451,163 +401,226 @@ bool  Find_in_WaitList(WAIT_LIST* wait_list, char name[LEN]) {
 	}
 	return find;
 }
-bool Find_in_Delivery_truck(DELIVERY_TRUCK* delivery_truck, char name[LEN]) {
+bool Find_in_order_ready(ORDER_READY* order_ready, char* name) {
 	bool find = false;
-	while (delivery_truck != NULL && find == false) {
-		if (strcmp(delivery_truck->name, name) == 0)
+	while (order_ready != NULL && find == false) {
+		if (strcmp(order_ready->name, name) == 0)
 			find = true;
 		else
-			delivery_truck = delivery_truck->next;
+			order_ready = order_ready->next;
 	}
 	return find;
-
+}
+RECIPE_TREE_NODE* Find_min_recipe(RECIPE_TREE_NODE* root) {
+	RECIPE_TREE_NODE* treenode = root;
+	if (treenode != NULL) {
+		while (treenode->left != NULL) {
+			treenode = treenode->left;
+		}
+	}
+	return treenode;
 }
 
-ORDER_POINTERS* Check_ing_for_order(RECIPE* recipe, PROD_TREE_NODE* prod_root, char name[LEN], int num) {
-	// check if the recipe and the ingredient are ok for making the order.
+RECIPE_TREE_NODE* Delete_recipe(RECIPE_TREE_NODE* root, char* name) {
 
-	ORDER_POINTERS* order_pointers = NULL;
-
-	bool recipe_check = false;
-	while (recipe != NULL && recipe_check != true) {
-		if (strcmp(recipe->name, name) == 0) {
-			order_pointers = (ORDER_POINTERS*)malloc(sizeof(ORDER_POINTERS));
-
-			order_pointers->recipe = recipe;
-			recipe_check = true;
-
-			ING_POINTER* order_ing_pointer = NULL;
-			if (storage != NULL)
-				order_ing_pointer = Check_all_the_ing_after_refill(recipe->ingredient, storage, num);
-
-			order_pointers->ing_pointer = order_ing_pointer;
-
-		}
+	if (root == NULL) {
+		printf("non presente\n");
+		return root;
+	}
+	else if (strcmp(root->name, name) > 0) {
+		if (root->left != NULL)
+			root->left = Delete_recipe(root->left, name);
 		else {
-			recipe = recipe->next;
+			printf("non presente\n");
 		}
-
 	}
-
-	return order_pointers;
-
-}
-
-DELIVERY_TRUCK* sort_the_new_order(DELIVERY_TRUCK* new_delivery, DELIVERY_TRUCK* delivery_truck) {
-	if (delivery_truck == NULL) {
-		delivery_truck = new_delivery;
-	}
-	else {
-
-		if (delivery_truck->next == NULL)
-		{
-			if (delivery_truck->time > new_delivery->time) {
-				new_delivery->next = delivery_truck;
-				delivery_truck = new_delivery;
-			}
-			else
-				delivery_truck->next = new_delivery;
-		}
+	else if (strcmp(root->name, name) < 0) {
+		if (root->right != NULL)
+			root->right = Delete_recipe(root->right, name);
 		else {
-			DELIVERY_TRUCK* delivery_truck_tmp = delivery_truck;
-			DELIVERY_TRUCK* delivery_truck_tmp_next = delivery_truck_tmp->next;
-			bool sorted = false;
-			while (sorted != true) { //delivery_truck_tmp != NULL &&
-				if (delivery_truck->time > new_delivery->time) {
-					new_delivery->next = delivery_truck;
-					delivery_truck = new_delivery;
-					sorted = true;
-
-				}
-				else if (delivery_truck_tmp_next->next == NULL) {
-					if (delivery_truck_tmp_next->time > new_delivery->time) {
-						new_delivery->next = delivery_truck_tmp_next;
-						delivery_truck_tmp->next = new_delivery;
-						sorted = true;
-					}
-					else {
-						delivery_truck_tmp_next->next = new_delivery;
-						sorted = true;
-					}
-				}
-				else if (delivery_truck_tmp_next->time > new_delivery->time) {
-					new_delivery->next = delivery_truck_tmp_next;
-					delivery_truck_tmp->next = new_delivery;
-					sorted = true;
-				}
-				else {
-					delivery_truck_tmp = delivery_truck_tmp_next;
-					delivery_truck_tmp_next = delivery_truck_tmp_next->next;
-				}
-			}
+			printf("non presente\n");
 		}
+
 	}
-	return delivery_truck;
-}
+	else {// found the node that need to be deleated
 
-DELIVERY_TRUCK* Prepare_the_order(WAIT_LIST* order_list, DELIVERY_TRUCK* delivery_truck) {
-
-	DELIVERY_TRUCK* new_delivery = (DELIVERY_TRUCK*)malloc(sizeof(DELIVERY_TRUCK));
-	new_delivery->time = order_list->time;
-	strcpy(new_delivery->name, order_list->order_pointer->recipe->name);
-	new_delivery->quantity = order_list->quantity;
-	new_delivery->weight = 0;
-
-	new_delivery->next = NULL;
-
-	INGREDIENT* ing = order_list->order_pointer->recipe->ingredient;
-	ING_POINTER* ing_point = order_list->order_pointer->ing_pointer;
-	while (ing != NULL) {
-		ITEM_QUEUE* storage = ing_point->recipe_ingredients;
-		int tot = ing->quantity * order_list->quantity;
-		if (tot < storage->item->quantity) {
-			storage->item->quantity = storage->item->quantity - tot;
+		if (root->left == NULL && root->right == NULL) { // case 1: no child
+			printf("rimossa\n");
+			free(root);
+			root = NULL;
 		}
-		else if (tot == storage->item->quantity) {
-			ITEM* tmp = storage->item;
-			storage->item = storage->item->next;
+		else if (root->left == NULL) { // case 2: one child [RIGHT]
+			printf("rimossa\n");
+			RECIPE_TREE_NODE* tmp = root;
+			root = root->right;
 			free(tmp);
 		}
-		else {
-			int tot_tmp = tot;
-			while (tot_tmp > 0) {
-				if (tot_tmp < storage->item->quantity) {
-					storage->item->quantity = storage->item->quantity - tot_tmp;
-					tot_tmp = 0;
-				}
-				else if (tot_tmp >= storage->item->quantity) {
-					tot_tmp = tot_tmp - storage->item->quantity;
-					ITEM* tmp = storage->item;
-					storage->item = storage->item->next;
-					free(tmp);
-					//storage = tmp;
-				}
+		else if (root->right == NULL) { // case 2: one child [LEFT]
+			printf("rimossa\n");
+			RECIPE_TREE_NODE* tmp = root;
+			root = root->left;
+			free(tmp);
+		}
+		else {// case 3: two child 
+			printf("rimossa\n");
+			RECIPE_TREE_NODE* tmp = Find_min_recipe(root->right);
+			strcpy(root->name, tmp->name);
+			root->ingredient = tmp->ingredient;
+			root->right = Delete_recipe(root->name, tmp->name);
+		}
+
+	}
+	return root;
+}
+
+
+// =============================== ORDER'S PREPARATION====================================
+ORDER_READY* sort_the_new_order_ready(ORDER_READY* new_order, ORDER_READY* order_ready) {
+	ORDER_READY* order_ready_tmp = order_ready;
+	if (order_ready == NULL) {
+		order_ready = new_order;
+	}
+	else {
+		bool sorted = false;
+		while (sorted != true) {
+			if (order_ready_tmp->next == NULL) {
+				order_ready_tmp->next = new_order;
+				sorted = true;
 			}
+			else if (order_ready_tmp->next->time > new_order->time) {
+				new_order->next = order_ready_tmp->next;
+				order_ready_tmp->next = new_order;
+				sorted = true;
+			}
+			else
+				order_ready_tmp = order_ready_tmp->next;
+		}
+	}
+	return order_ready;
+}
+
+void Take_item_from_prod(PROD_TREE_NODE* prod, int ing_weight) {
+	prod->quantity_tot -= ing_weight;
+	while (ing_weight > 0) {
+		if (ing_weight < prod->item->quantity) { // ing_weight is fully contained in the first slot of prod
+			ing_weight -= prod->item->quantity;
+		}
+		else {  // ing_weight needs more or equal than one slot of item so I need to do stuff
+
+			ing_weight -= prod->item->quantity;
+			ITEM* tmp = prod->item;
+			prod->item = prod->item->next;
+			free(tmp);
 
 		}
-		ing = ing->next;
-		ing_point = ing_point->next;
-		new_delivery->weight += tot;
 	}
 
-	delivery_truck = sort_the_new_order(new_delivery, delivery_truck);
-
-	return delivery_truck;
 }
 
-DELIVERY_TRUCK* Copy_truck_value(DELIVERY_TRUCK* delivery_truck) {
-	DELIVERY_TRUCK* loading_queue = (DELIVERY_TRUCK*)malloc(sizeof(DELIVERY_TRUCK));
-	if (delivery_truck != NULL) {
-		strcpy(loading_queue->name, delivery_truck->name);
-		loading_queue->quantity = delivery_truck->quantity;
-		loading_queue->time = delivery_truck->time;
-		loading_queue->weight = delivery_truck->weight;
-		loading_queue->next = NULL;
+ORDER_READY* Prepare_the_order(WAIT_LIST* order_from_waitlist, ORDER_READY* order_ready) {
+
+	ORDER_READY* new_order = (ORDER_READY*)malloc(sizeof(ORDER_READY)); // create a new_order node
+	new_order->time = order_from_waitlist->time;
+	strcpy(new_order->name, order_from_waitlist->order_pointer->recipe->name);
+	new_order->quantity = order_from_waitlist->quantity;
+	new_order->weight = 0;
+	new_order->next = NULL;
+
+	INGREDIENT* rec_ing = order_from_waitlist->order_pointer->recipe->ingredient; //recipe ingredient's pointer
+	PROD_POINTER* prod_item = order_from_waitlist->order_pointer->prod_pointer;//prod item's pointer
+
+	while (rec_ing != NULL) {
+		int ing_weight = new_order->quantity * rec_ing->quantity;
+
+		Take_item_from_prod(prod_item->prod_node, ing_weight);
+
+		new_order->weight += ing_weight;
+		rec_ing = rec_ing->next;
+		prod_item = prod_item->next;
+	}
+
+	order_ready = sort_the_new_order_ready(new_order, order_ready);
+
+	return order_ready;
+}
+
+// =============================== DELIVERY TRUCK =========================================
+
+DELIVERY_TRUCK* Create_new_delivery(ORDER_READY* order_ready) {
+	DELIVERY_TRUCK* new_delivery = (DELIVERY_TRUCK*)malloc(sizeof(DELIVERY_TRUCK));
+	if (order_ready != NULL) {
+		strcpy(new_delivery->name, order_ready->name);
+		new_delivery->quantity = order_ready->quantity;
+		new_delivery->time = order_ready->time;
+		new_delivery->weight = order_ready->weight;
+		new_delivery->next = NULL;
 	}
 	else
-		loading_queue = NULL;
-	return loading_queue;
+		new_delivery = NULL;
+	return new_delivery;
 }
+DELIVERY_TRUCK* Sort_delivery(DELIVERY_TRUCK* delivery, DELIVERY_TRUCK* new_delivery) {
+	if (delivery != NULL) {
+		DELIVERY_TRUCK* delivery_tmp = delivery;
+		bool sorted = false;
+
+		if (delivery->weight < new_delivery->weight) {
+			new_delivery->next = delivery;
+			delivery = new_delivery;
+		}
+		else {
+			while (sorted != true) {
+
+				if (delivery_tmp->next == NULL) {
+					delivery_tmp->next = new_delivery;
+					sorted = true;
+				}
+				else if (delivery_tmp->next->weight < new_delivery->weight) {
+					new_delivery->next = delivery_tmp->next;
+					delivery_tmp->next = new_delivery;
+					sorted = true;
+				}
+				else
+					delivery_tmp = delivery_tmp->next;
+			}
+		}
+	}
+	else
+		delivery = new_delivery;
+	return delivery;
+}
+void Print_and_empty_truck(DELIVERY_TRUCK* delivery) {
+	while (delivery != NULL) {
+		DELIVERY_TRUCK* tmp = delivery;
+		printf(" %d %s %d\n", delivery->time, delivery->name, delivery->weight);
+		delivery = delivery->next;
+		free(tmp);
+	}
+}
+
+ORDER_READY* Load_the_delivery_truck(ORDER_READY* order_ready, int delivery_dim) {
+	int load_weight = 0;
+	DELIVERY_TRUCK* delivery = NULL;
+	while (load_weight < delivery_dim) {
+		if (order_ready != NULL) {
+			load_weight += order_ready->weight;
+			if (load_weight <= delivery_dim) {
+
+				DELIVERY_TRUCK* new_delivery = Create_new_delivery(order_ready); // put the order on the truck
+				delivery = Sort_delivery(delivery, new_delivery);
+				ORDER_READY* tmp = order_ready; //delete the order from its queue
+				order_ready = order_ready->next;
+				free(tmp);
+
+			}
+		}
+		else
+			break;
+	}
+	Print_and_empty_truck(delivery);
+	return order_ready;
+}
+
 
 
 
@@ -633,7 +646,7 @@ int main() {
 	WAIT_LIST* wait_list_tail = NULL;
 
 	// order ready for the DELIVERY_TRUCK
-	DELIVERY_TRUCK* delivery_truck = NULL;
+	ORDER_READY* order_ready = NULL;
 
 	//def of the delivery truck
 
@@ -656,81 +669,12 @@ int main() {
 		if (fgets(buffer, BLEN, stdin) != NULL) {
 
 			do {
-				//printf("%d. ", program_clock);
+
 				//chosing the option and considering the delivery
 				if (program_clock != 0 && program_clock % delivery_clock == 0) {
-					//delivery
-					int load = 0;
-
-
-					DELIVERY_TRUCK* new_loading_queue = NULL;
-					DELIVERY_TRUCK* loading_queue = NULL;
-
-					if (delivery_truck != NULL) {
-						while (delivery_truck != NULL && load < delivery_dim) {
-
-							load += delivery_truck->weight;
-							if (load < delivery_dim) {
-								new_loading_queue = Copy_truck_value(delivery_truck);
-
-								if (loading_queue == NULL) {
-									loading_queue = new_loading_queue;
-								}
-
-								else if (loading_queue->next == NULL) {
-									if (loading_queue->weight < new_loading_queue->weight) {
-										new_loading_queue->next = loading_queue;
-										loading_queue = new_loading_queue;
-									}
-									else {
-										loading_queue->next = new_loading_queue;
-									}
-
-								}
-								else if (loading_queue->weight < new_loading_queue->weight) {
-									new_loading_queue->next = loading_queue;
-									loading_queue = new_loading_queue;
-								}
-								else {
-									DELIVERY_TRUCK* loading_queue_tmp = loading_queue;
-									bool sorted = false;
-
-									while (loading_queue_tmp != NULL && sorted != true) {
-										if (loading_queue_tmp->next == NULL) {
-											loading_queue_tmp->next = new_loading_queue;
-											sorted = true;
-										}
-										if (loading_queue_tmp->next->weight < new_loading_queue->weight) {
-											new_loading_queue->next = loading_queue_tmp->next;
-											loading_queue_tmp->next = new_loading_queue;
-											sorted = true;
-										}
-										else
-											loading_queue_tmp = loading_queue_tmp->next;
-									}
-
-								}
-								DELIVERY_TRUCK* delivery_tmp = delivery_truck->next;
-								free(delivery_truck);
-								delivery_truck = delivery_tmp;
-								//free(delivery_tmp);
-							}
-
-						}
-
-
-						if (loading_queue == NULL) {
-							printf("camioncino vuoto\n");
-						}
-						else {
-							while (loading_queue != NULL) {
-								DELIVERY_TRUCK* tmp = loading_queue;
-								printf("%d %s %d\n", loading_queue->time, loading_queue->name, loading_queue->quantity);
-								loading_queue = loading_queue->next;
-								free(tmp);
-							}
-						}
-					}
+					//delivery	
+					if (order_ready != NULL)
+						order_ready = Load_the_delivery_truck(order_ready, delivery_dim);
 					else
 						printf("camioncino vuoto\n");
 				}
@@ -739,7 +683,7 @@ int main() {
 
 				// check if something went rotten
 
-				prod_root = Check_if_somethink_is_rotten(prod_root, program_clock);
+				//prod_root = Check_if_somethink_is_rotten(prod_root, program_clock);
 
 
 
@@ -760,7 +704,7 @@ int main() {
 
 					INGREDIENT* ing = NULL;
 
-					while (buffer != '\n') {
+					while (buffer[0] != '\n') {
 						char ing_name[LEN];
 						int quantity;
 
@@ -772,8 +716,8 @@ int main() {
 							strcpy(buffer, bebbo);
 
 						// creting a temporary recipe
-						INGREDIENT* new_ing = Create_new_ingredient(name, quantity);
-						if (ing = NULL) {
+						INGREDIENT* new_ing = Create_new_ingredient(ing_name, quantity);
+						if (ing == NULL) {
 							ing = new_ing;
 						}
 						else {
@@ -789,7 +733,7 @@ int main() {
 					if (recipe_root == NULL) {
 
 						recipe_root = recipe_tmp;
-
+						printf("aggiunta\n");
 					}
 					else {
 
@@ -810,13 +754,10 @@ int main() {
 					//new_ing = Sort_ingredient(iterator->ingredient, new_ing);
 
 				}
-
-
-
 				else if (strcmp(key_menu, "rimuovi_ricetta") == 0)	// rimuovi ricetta
 				{
 
-					
+
 					sscanf(buffer, "%s", name);
 					bebbo = Chop_word(buffer, name);
 					//*buffer = Chop_word(buffer, name);
@@ -826,15 +767,14 @@ int main() {
 					else
 						strcpy(buffer, bebbo);
 
-
-					bool find_in_ws = Find_in_WaitList(wait_list, name);
-					bool find_in_dt = Find_in_Delivery_truck(delivery_truck, name);
-					if (find_in_ws == false && find_in_dt == false) {
-						recipe_root = Delete_recipe(recipe_root, name);
+					if (Find_in_WaitList(wait_list, name) == false)
+					{
+						if (Find_in_order_ready(order_ready, name) == false)
+							recipe_root = Delete_recipe(recipe_root, name);
 					}
-					else {
+					else
 						printf("ordini in sospeso\n");
-					}
+
 
 
 
@@ -872,7 +812,7 @@ int main() {
 						if (prod_root == NULL) { // if the Prod_tree is empty i create the prod_root
 
 							//prod_root->item = Sort_new_prod_item(prod_root->item, new_item);
-							prod_root = Create_Child_node(tmp_name, new_item);
+							prod_root = Create_prod_child_node(tmp_name, new_item);
 						}
 						else {
 
@@ -882,139 +822,107 @@ int main() {
 
 
 					}
-
-				}
-
-				// check if now some order in wait list can be processed
-
-				/*
-				if (wait_list != NULL) {
-					WAIT_LIST* wl_iterator = wait_list;
-
-					while (wl_iterator != NULL) {
+					printf("rifornito\n");
 
 
+					// check if now some order in wait list can be processed
 
-					}
+					if (wait_list != NULL) {
+						WAIT_LIST* wl_iterator = wait_list;
+						WAIT_LIST* last_blocked = NULL;
 
+						while (wl_iterator != NULL) {
 
-				}
-				*/
+							if (wl_iterator->next == NULL)
+								wait_list_tail = last_blocked;
 
+							wl_iterator->order_pointer->prod_pointer = Check_ing_for_order(wl_iterator->order_pointer->recipe->ingredient, prod_root, wl_iterator->quantity);
 
-				/*
-				if (wait_list != NULL) {
-					WAIT_LIST* iterator = wait_list;
-					WAIT_LIST* last_blocked = NULL;
+							if (wl_iterator->order_pointer->prod_pointer != NULL) {
+								WAIT_LIST* tmp = wl_iterator;
+								order_ready = Prepare_the_order(wl_iterator, order_ready);
+								wl_iterator = wl_iterator->next;
+								free(tmp);//delete the temporary storing
 
-					while (iterator != NULL) {
-
-						if (iterator->next == NULL)
-							wait_list_tail = iterator;
-
-						INGREDIENT* ing = iterator->order_pointer->recipe->ingredient;
-						ING_POINTER* ing_pointers = NULL;
-						int num = iterator->quantity;
-						ing_pointers = Check_all_the_ing_after_refill(ing, prod, num);
-
-						if (ing_pointers != NULL) {
-
-							iterator->order_pointer->ing_pointer = ing_pointers;
-							delivery_truck = Prepare_the_order(iterator, delivery_truck);
-
-							WAIT_LIST* free_wait_list = iterator;
-							iterator = iterator->next;
-							if (last_blocked == NULL) {
-								wait_list = iterator;
 							}
 							else {
-								last_blocked->next = iterator;
+								last_blocked = wl_iterator; //connect the gap beetwne two element still in waitlist
+								wl_iterator = wl_iterator->next;
 							}
-							free(free_wait_list);
+						}
+
+					}
 
 
+
+
+				}
+				else if (strcmp(key_menu, "ordine") == 0)	// ordine
+				{
+					int number = 0;
+
+					sscanf(buffer, "%s %d", name, &number);
+
+					// struct for saving pointers for the order
+					ORDER_POINTERS* order_pointers = (ORDER_POINTERS*)malloc(sizeof(ORDER_POINTERS));
+					order_pointers->prod_pointer = NULL;
+					order_pointers->recipe = NULL;
+
+
+					order_pointers->recipe = Check_recipe_for_order(recipe_root, name);
+					if (order_pointers->recipe != NULL) {
+						order_pointers->prod_pointer = Check_ing_for_order(order_pointers->recipe->ingredient, prod_root, number);
+
+						WAIT_LIST* new_wait_list = (WAIT_LIST*)malloc(sizeof(WAIT_LIST)); // create wait_list
+
+						new_wait_list->order_pointer = order_pointers;
+						new_wait_list->time = program_clock;
+						new_wait_list->quantity = number;
+						new_wait_list->next = NULL;
+
+
+						if (order_pointers->prod_pointer != NULL) {
+							// delivery_truck
+							//printf("%s nel carretto \n", name);
+							order_ready = Prepare_the_order(new_wait_list, order_ready);
+							free(new_wait_list);//delete the temporary storing
 						}
 						else {
-							last_blocked = iterator;
-							iterator = iterator->next;
+							// adding at the tail of waitlist
+							if (wait_list == NULL) {
+								wait_list = new_wait_list;
+								wait_list_tail = wait_list;
+							}
+							else {
 
+								wait_list_tail->next = new_wait_list;
+								wait_list_tail = new_wait_list;
+							}
 						}
-
-
-
+						printf("accettato\n");
 					}
+
+					else
+						printf("rifiutato\n");
 
 
 				}
 
-				*/
+				program_clock++;
 
+			} while (fgets(buffer, BLEN, stdin) != NULL);
 
-				printf("rifornito\n");
-			}
-		else if (strcmp(key_menu, "ordine") == 0)			// ordine
-		{
-			int number = 0;
+			/*
+				// Termina la misurazione del tempo
+				clock_t end_time = clock();
 
-			sscanf(buffer, "%s %d", name, &number);
+				// Calcola il tempo trascorso in secondi
+				double time_taken = ((double)(end_time - start_time)) / CLOCKS_PER_SEC;
 
-			// struct for saving pointers for the order
-			ORDER_POINTERS* order_pointers = NULL;
+				printf("Runtime:: %f s.\n", time_taken);
 
-			order_pointers = Check_ing_for_order(recipes, prod_root, name, number);
-
-
-			if (order_pointers != NULL) { // if != NULL im shure that at least the Recipe exist
-
-
-				WAIT_LIST* new_wait_list = (WAIT_LIST*)malloc(sizeof(WAIT_LIST));
-
-				new_wait_list->order_pointer = order_pointers;
-				new_wait_list->time = program_clock;
-				new_wait_list->quantity = number;
-				new_wait_list->next = NULL;
-				if (order_pointers->ing_pointer != NULL) {
-					// delivery_truck
-					printf("%s nel carretto \n", name);
-					delivery_truck = Prepare_the_order(new_wait_list, delivery_truck);
-					free(new_wait_list);//delete the temporari storing
-
-				}
-				else {
-					//printf("%s accettato in wait list\n", name);
-					if (wait_list == NULL) {
-						wait_list = new_wait_list;
-						wait_list_tail = wait_list;
-					}
-					else {
-						// wait_list
-						wait_list_tail->next = new_wait_list;
-						wait_list_tail = new_wait_list;
-					}
-				}
-				printf("accettato\n");
-			}
-			else
-				printf("rifiutato\n");
-
-
+			*/
 		}
-
-		program_clock++;
-
-		} while (fgets(buffer, BLEN, stdin) != NULL);
-
-		/*
-			// Termina la misurazione del tempo
-			clock_t end_time = clock();
-
-			// Calcola il tempo trascorso in secondi
-			double time_taken = ((double)(end_time - start_time)) / CLOCKS_PER_SEC;
-
-			printf("Runtime:: %f s.\n", time_taken);
-
-		*/
 	}
-}
-return 0;
+	return 0;
 }
