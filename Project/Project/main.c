@@ -462,7 +462,6 @@ RECIPE_TREE_NODE* Delete_recipe(RECIPE_TREE_NODE* root, char* name) {
 			free(tmp);
 		}
 		else {// case 3: two child 
-			printf("rimossa\n");
 			RECIPE_TREE_NODE* tmp = Find_min_recipe(root->right);
 			strcpy(root->name, tmp->name);
 			root->ingredient = tmp->ingredient;
@@ -592,7 +591,7 @@ DELIVERY_TRUCK* Sort_delivery(DELIVERY_TRUCK* delivery, DELIVERY_TRUCK* new_deli
 void Print_and_empty_truck(DELIVERY_TRUCK* delivery) {
 	while (delivery != NULL) {
 		DELIVERY_TRUCK* tmp = delivery;
-		printf(" %d %s %d\n", delivery->time, delivery->name, delivery->quantity);
+		printf("%d %s %d\n", delivery->time, delivery->name, delivery->quantity);
 		delivery = delivery->next;
 		free(tmp);
 	}
@@ -761,6 +760,8 @@ int main() {
 					{
 						if (order_ready == NULL || Find_in_order_ready(order_ready, name) == false)
 							recipe_root = Delete_recipe(recipe_root, name);
+						else
+							printf("ordini in sospeso\n");
 					}
 					else
 						printf("ordini in sospeso\n");
@@ -819,45 +820,88 @@ int main() {
 
 					if (wait_list != NULL) {
 						WAIT_LIST* wl_iterator = wait_list;
-						WAIT_LIST* last_blocked = NULL;
+						WAIT_LIST* still_in_wl = NULL;
 
 						while (wl_iterator != NULL) {
-
 							wl_iterator->order_pointer->prod_pointer = Check_ing_for_order(wl_iterator->order_pointer->recipe->ingredient, prod_root, wl_iterator->quantity);
 
 							if (wl_iterator->order_pointer->prod_pointer != NULL) {
-
+								// order is ready to be processed
 								WAIT_LIST* tmp = wl_iterator;
 								order_ready = Prepare_the_order(wl_iterator, order_ready);
-								if (wl_iterator->next == NULL) {
-									wait_list_tail = wl_iterator;
-									wl_iterator = NULL;
-								}
-								else
-									wl_iterator = wl_iterator->next;
-
-								free(tmp);//delete the temporary storing		
-
-
+								wl_iterator = wl_iterator->next;
+								free(tmp);
 							}
 							else {
-								if (last_blocked == NULL) {//Set the new Waitlist head
-									last_blocked = wl_iterator;
-									wait_list = last_blocked;
+								//order need to stay in wait list
+								if (still_in_wl == NULL) {
+									still_in_wl = wl_iterator;
+									wait_list = still_in_wl;
+
 								}
 								else {
-									last_blocked->next = wl_iterator; //connect the gap beetween two element still in waitlist
-									last_blocked = wl_iterator;
+									still_in_wl->next = wl_iterator;
+									still_in_wl = wl_iterator;
 								}
-								if (wl_iterator != NULL)
-									wl_iterator = wl_iterator->next;
+								wait_list_tail = still_in_wl;
+								
+								wl_iterator = wl_iterator->next;
+
+								
 							}
+
 						}
-						if (last_blocked == NULL) {
+						
+						if (still_in_wl == NULL)
 							wait_list = NULL;
-							//wait_list = Free_all_wait_list(wait_list);
+						else if (wl_iterator == NULL) {
+							still_in_wl->next = wl_iterator;
+							wait_list_tail->next = NULL;
+						}
+
+					}
+
+
+
+
+
+					/*
+					while (wl_iterator != NULL) {
+
+						wl_iterator->order_pointer->prod_pointer = Check_ing_for_order(wl_iterator->order_pointer->recipe->ingredient, prod_root, wl_iterator->quantity);
+
+						if (wl_iterator->order_pointer->prod_pointer != NULL) {
+
+							WAIT_LIST* tmp = wl_iterator;
+							order_ready = Prepare_the_order(wl_iterator, order_ready);
+							if (wl_iterator->next == NULL) {
+								wait_list_tail = wl_iterator;
+								wl_iterator = NULL;
+							}
+							else
+								wl_iterator = wl_iterator->next;
+
+							free(tmp);//delete the temporary storing
+						}
+						else {
+							if (last_blocked == NULL) {//Set the new Waitlist head
+								last_blocked = wl_iterator;
+								wait_list = last_blocked;
+							}
+							else {
+								last_blocked->next = wl_iterator; //connect the gap beetween two element still in waitlist
+								last_blocked = wl_iterator;
+							}
+							if (wl_iterator != NULL)
+								wl_iterator = wl_iterator->next;
 						}
 					}
+					if (last_blocked == NULL) {
+						wait_list = NULL;
+						//wait_list = Free_all_wait_list(wait_list);
+					}
+					*/
+
 
 
 
