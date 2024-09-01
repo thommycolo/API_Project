@@ -88,6 +88,16 @@ typedef struct delivery_truck_node {
 // Function declaring
 
 // ============================ PROD AND ITEM FILLING CREATION =========================
+
+void Check_if_some_item_is_decayed(PROD_TREE_NODE* prod, int program_clock) {
+	while (prod->item != NULL && program_clock >= prod->item->decay) {
+		ITEM* tmp = prod->item;
+		prod->quantity_tot -= prod->item->quantity;
+		prod->item = prod->item->next;
+		free(tmp);
+	}
+
+}
 PROD_TREE_NODE* Create_prod_child_node(char* name, ITEM* item) {
 
 	PROD_TREE_NODE* new_node = (PROD_TREE_NODE*)malloc(sizeof(PROD_TREE_NODE));
@@ -101,66 +111,66 @@ PROD_TREE_NODE* Create_prod_child_node(char* name, ITEM* item) {
 	}
 	return new_node;
 }
-
 ITEM* Sort_the_item(ITEM* item, ITEM* new_item) {
 
 	ITEM* item_iterator = item;
 	bool sorted = false;
+	if (item != NULL) {
+		if (item->decay > new_item->decay) { // switching the first position if necessary
+			new_item->next = item;
+			item = new_item;
+			sorted = true;
+		}
+		while (sorted != true) {
 
-	if (item->decay > new_item->decay) { // switching the first position if necessary
-		new_item->next = item;
+			if (item_iterator->next == NULL) { // adding in the right position the new item
+				new_item->next = NULL;
+				item_iterator->next = new_item;
+				sorted = true;
+			}
+			else if (item_iterator->next->decay > new_item->decay) {
+				new_item->next = item_iterator->next;
+				item_iterator->next = new_item;
+				sorted = true;
+			}
+			else
+				item_iterator = item_iterator->next;
+		}
+	}
+	else
 		item = new_item;
-		sorted = true;
-	}
-	while (sorted != true) {
-
-		if (item_iterator->next == NULL) { // adding in the right position the new item
-			new_item->next = NULL;
-			item_iterator->next = new_item;
-			sorted = true;
-		}
-		else if (item_iterator->next->decay > new_item->decay) {
-			new_item = item_iterator->next;
-			item_iterator->next = new_item;
-			sorted = true;
-		}
-		else
-			item_iterator = item_iterator->next;
-	}
-
 	return item;
 }
-
-
-void Sort_new_prod(PROD_TREE_NODE* prod_root, char* name[LEN], ITEM* new_item) {
+void Sort_new_prod(PROD_TREE_NODE* prod_root, char* name[LEN], ITEM* new_item,int program_clock) {
 	bool sorted = false;
-	PROD_TREE_NODE* treenode = prod_root;
+	//PROD_TREE_NODE* treenode = prod_root;
 
 	while (sorted != true) {
 
-		if (strcmp(treenode->name, name) == 0) { // new_prod is alredy existing in prood_root
-			treenode->quantity_tot += new_item->quantity;
-			treenode->item = Sort_the_item(treenode->item, new_item);
+		if (strcmp(prod_root->name, name) == 0) { // new_prod is alredy existing in prood_root
+			Check_if_some_item_is_decayed(prod_root, program_clock);
+			prod_root->quantity_tot += new_item->quantity;
+			prod_root->item = Sort_the_item(prod_root->item, new_item);
 			sorted = true;
 		}
 		else {
-			if (strcmp(treenode->name, name) < 0) { // tmp_name is bigger than the father, so i check on his right
-				if (treenode->right == NULL) {
+			if (strcmp(prod_root->name, name) < 0) { // tmp_name is bigger than the father, so i check on his right
+				if (prod_root->right == NULL) {
 					PROD_TREE_NODE* new_node = Create_prod_child_node(name, new_item);// haven't found new_prod in the prod_root so i create a new node
-					treenode->right = new_node;
+					prod_root->right = new_node;
 					sorted = true;
 				}
 				else
-					treenode = treenode->right;
+					prod_root = prod_root->right;
 			}
 			else { // tmp_name is smaller than the father, so i check on his left
-				if (treenode->left == NULL) {
+				if (prod_root->left == NULL) {
 					PROD_TREE_NODE* new_node = Create_prod_child_node(name, new_item);// haven't found new_prod in the prod_root so i create a new node
-					treenode->left = new_node;
+					prod_root->left = new_node;
 					sorted = true;
 				}
 				else
-					treenode = treenode->left;
+					prod_root = prod_root->left;
 			}
 
 		}
@@ -322,18 +332,26 @@ RECIPE_TREE_NODE* Check_recipe_for_order(RECIPE_TREE_NODE* recipe_root, char* na
 	}
 	return recipe_root;
 }
-
-PROD_TREE_NODE* Find_prod(PROD_TREE_NODE* prod_root, char* name, int quantity_tot) {
+PROD_TREE_NODE* Find_prod(PROD_TREE_NODE* prod_root, char* name, int quantity_tot, int program_clock) {
 	bool find = false;
 
 	if (prod_root != NULL) {
 		while (prod_root != NULL && find != true) {
 
-			if (strcmp(prod_root->name, name) == 0) { // i've found the prod
-				if (prod_root->quantity_tot >= quantity_tot) // Check if there is enough item in storage to perform the order
-					find = true;
+			if (strcmp(prod_root->name, name) == 0) { // i've found the prod	
+				if (prod_root->item != NULL) {
+					Check_if_some_item_is_decayed(prod_root, program_clock);
+					if (prod_root->item != NULL) {
+						if (prod_root->quantity_tot >= quantity_tot) // Check if there is enough item in storage to perform the order
+							find = true;
+						else
+							break;
+					}
+					else
+						break;
+				}
 				else
-					return NULL;
+					break;
 			}
 			else {
 				if (strcmp(prod_root->name, name) < 0) { // tmp_name is bigger than the father, so i check on his right
@@ -345,9 +363,11 @@ PROD_TREE_NODE* Find_prod(PROD_TREE_NODE* prod_root, char* name, int quantity_to
 			}
 		}
 	}
-	return prod_root;
+	if (find == true)
+		return prod_root;
+	else
+		return NULL;
 }
-
 void Delete_all_tmp_ing_pointer(PROD_POINTER* ing_pointer) {
 	while (ing_pointer != NULL) {
 		PROD_POINTER* tmp = ing_pointer;
@@ -356,14 +376,13 @@ void Delete_all_tmp_ing_pointer(PROD_POINTER* ing_pointer) {
 	}
 
 }
-
-PROD_POINTER* Check_ing_for_order(INGREDIENT* rec_ingredient, PROD_TREE_NODE* prod_root, int number) {
+PROD_POINTER* Check_ing_for_order(INGREDIENT* rec_ingredient, PROD_TREE_NODE* prod_root, int number, int program_clock) {
 	PROD_POINTER* prod_pointer = NULL;
 	PROD_POINTER* prod_pointer_tail = prod_pointer;
 
 	while (rec_ingredient != NULL) {
 		int quantity_tot = rec_ingredient->quantity * number;// is the total amount of item necessary
-		PROD_TREE_NODE* prod_tmp = Find_prod(prod_root, rec_ingredient->name, quantity_tot); // find the prod and if there is enough item in storage
+		PROD_TREE_NODE* prod_tmp = Find_prod(prod_root, rec_ingredient->name, quantity_tot, program_clock); // find the prod and if there is enough item in storage
 
 		if (prod_tmp != NULL) {
 			PROD_POINTER* new_prod_pointer = (PROD_POINTER*)malloc(sizeof(PROD_POINTER));
@@ -420,7 +439,6 @@ RECIPE_TREE_NODE* Find_min_recipe(RECIPE_TREE_NODE* root) {
 	}
 	return treenode;
 }
-
 RECIPE_TREE_NODE* Delete_recipe(RECIPE_TREE_NODE* root, char* name) {
 
 	if (root == NULL) {
@@ -472,7 +490,6 @@ RECIPE_TREE_NODE* Delete_recipe(RECIPE_TREE_NODE* root, char* name) {
 	return root;
 }
 
-
 // =============================== ORDER'S PREPARATION====================================
 ORDER_READY* sort_the_new_order_ready(ORDER_READY* new_order, ORDER_READY* order_ready) {
 	ORDER_READY* order_ready_tmp = order_ready;
@@ -497,25 +514,25 @@ ORDER_READY* sort_the_new_order_ready(ORDER_READY* new_order, ORDER_READY* order
 	}
 	return order_ready;
 }
-
 void Take_item_from_prod(PROD_TREE_NODE* prod, int ing_weight) {
-	prod->quantity_tot -= ing_weight;
+	
 	while (ing_weight > 0) {
-		if (ing_weight < prod->item->quantity) { // ing_weight is fully contained in the first slot of prod
-			ing_weight -= prod->item->quantity;
-		}
-		else {  // ing_weight needs more or equal than one slot of item so I need to do stuff
+		if (ing_weight != 0) {
+			if (ing_weight < prod->item->quantity) { // ing_weight is fully contained in the first slot of prod
+				prod->item->quantity -= ing_weight;
+				ing_weight = 0;
+			}
+			else {  // ing_weight needs more or equal than one slot of item so I need to do stuff
 
-			ing_weight -= prod->item->quantity;
-			ITEM* tmp = prod->item;
-			prod->item = prod->item->next;
-			free(tmp);
-
+				ing_weight -= prod->item->quantity;
+				ITEM* tmp = prod->item;
+				prod->item = prod->item->next;
+				free(tmp);
+			}
 		}
 	}
 
 }
-
 ORDER_READY* Prepare_the_order(WAIT_LIST* order_from_waitlist, ORDER_READY* order_ready) {
 
 	ORDER_READY* new_order = (ORDER_READY*)malloc(sizeof(ORDER_READY)); // create a new_order node
@@ -530,7 +547,13 @@ ORDER_READY* Prepare_the_order(WAIT_LIST* order_from_waitlist, ORDER_READY* orde
 
 	while (rec_ing != NULL) {
 		int ing_weight = new_order->quantity * rec_ing->quantity;
+		int bib = 0;
+		if (strcmp(prod_item->prod_node->name, "LwmxfmrCTXIgVUyPbsjx2") == 0)
+			bib = 1;
+		else
+			bib = 0;
 
+		prod_item->prod_node->quantity_tot = prod_item->prod_node->quantity_tot- ing_weight;
 		Take_item_from_prod(prod_item->prod_node, ing_weight);
 
 		new_order->weight += ing_weight;
@@ -664,7 +687,7 @@ int main() {
 		if (fgets(buffer, BLEN, stdin) != NULL) {
 
 			do {
-
+				printf("%d ", program_clock);
 				//chosing the option and considering the delivery
 				if (program_clock != 0 && program_clock % delivery_clock == 0) {
 					//delivery	
@@ -807,7 +830,7 @@ int main() {
 						}
 						else {
 
-							Sort_new_prod(prod_root, tmp_name, new_item);
+							Sort_new_prod(prod_root, tmp_name, new_item,program_clock);
 
 						}
 
@@ -823,7 +846,7 @@ int main() {
 						WAIT_LIST* still_in_wl = NULL;
 
 						while (wl_iterator != NULL) {
-							wl_iterator->order_pointer->prod_pointer = Check_ing_for_order(wl_iterator->order_pointer->recipe->ingredient, prod_root, wl_iterator->quantity);
+							wl_iterator->order_pointer->prod_pointer = Check_ing_for_order(wl_iterator->order_pointer->recipe->ingredient, prod_root, wl_iterator->quantity, program_clock);
 
 							if (wl_iterator->order_pointer->prod_pointer != NULL) {
 								// order is ready to be processed
@@ -844,14 +867,14 @@ int main() {
 									still_in_wl = wl_iterator;
 								}
 								wait_list_tail = still_in_wl;
-								
+
 								wl_iterator = wl_iterator->next;
 
-								
+
 							}
 
 						}
-						
+
 						if (still_in_wl == NULL)
 							wait_list = NULL;
 						else if (wl_iterator == NULL) {
@@ -860,51 +883,6 @@ int main() {
 						}
 
 					}
-
-
-
-
-
-					/*
-					while (wl_iterator != NULL) {
-
-						wl_iterator->order_pointer->prod_pointer = Check_ing_for_order(wl_iterator->order_pointer->recipe->ingredient, prod_root, wl_iterator->quantity);
-
-						if (wl_iterator->order_pointer->prod_pointer != NULL) {
-
-							WAIT_LIST* tmp = wl_iterator;
-							order_ready = Prepare_the_order(wl_iterator, order_ready);
-							if (wl_iterator->next == NULL) {
-								wait_list_tail = wl_iterator;
-								wl_iterator = NULL;
-							}
-							else
-								wl_iterator = wl_iterator->next;
-
-							free(tmp);//delete the temporary storing
-						}
-						else {
-							if (last_blocked == NULL) {//Set the new Waitlist head
-								last_blocked = wl_iterator;
-								wait_list = last_blocked;
-							}
-							else {
-								last_blocked->next = wl_iterator; //connect the gap beetween two element still in waitlist
-								last_blocked = wl_iterator;
-							}
-							if (wl_iterator != NULL)
-								wl_iterator = wl_iterator->next;
-						}
-					}
-					if (last_blocked == NULL) {
-						wait_list = NULL;
-						//wait_list = Free_all_wait_list(wait_list);
-					}
-					*/
-
-
-
-
 
 				}
 				else if (strcmp(key_menu, "ordine") == 0)	// ordine
@@ -921,7 +899,7 @@ int main() {
 
 					order_pointers->recipe = Check_recipe_for_order(recipe_root, name);
 					if (order_pointers->recipe != NULL) {
-						order_pointers->prod_pointer = Check_ing_for_order(order_pointers->recipe->ingredient, prod_root, number);
+						order_pointers->prod_pointer = Check_ing_for_order(order_pointers->recipe->ingredient, prod_root, number, program_clock);
 
 						WAIT_LIST* new_wait_list = (WAIT_LIST*)malloc(sizeof(WAIT_LIST)); // create wait_list
 

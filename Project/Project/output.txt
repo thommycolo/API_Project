@@ -1,24 +1,24 @@
-aggiunta
-ignorato
-accettato
-accettato
-accettato
-accettato
-accettato
-rifornito
-accettato
-accettato
-accettato
-rifornito
-accettato
-accettato
-accettato
-accettato
-aggiunta
-accettato
-accettato
-accettato
-18 R1sHSjaN7409HULkW_5iL 30
+0 aggiunta
+1 ignorato
+2 accettato
+3 accettato
+4 accettato
+5 accettato
+6 accettato
+7 rifornito
+8 accettato
+9 accettato
+10 accettato
+11 rifornito
+12 accettato
+13 accettato
+14 accettato
+15 accettato
+16 aggiunta
+17 accettato
+18 accettato
+19 accettato
+20 18 R1sHSjaN7409HULkW_5iL 30
 5 R1sHSjaN7409HULkW_5iL 24
 6 R1sHSjaN7409HULkW_5iL 23
 10 R1sHSjaN7409HULkW_5iL 23
@@ -33,89 +33,89 @@ accettato
 2 R1sHSjaN7409HULkW_5iL 3
 4 R1sHSjaN7409HULkW_5iL 3
 accettato
+21 accettato
+22 accettato
+23 accettato
+24 accettato
+25 accettato
+26 accettato
+27 accettato
+28 accettato
+29 ordini in sospeso
+30 accettato
+31 accettato
+32 accettato
+33 accettato
+34 accettato
+35 accettato
+36 accettato
+37 accettato
+38 accettato
+39 accettato
+40 camioncino vuoto
 accettato
+41 accettato
+42 accettato
+43 accettato
+44 accettato
+45 accettato
+46 ordini in sospeso
+47 accettato
+48 accettato
+49 rifiutato
+50 accettato
+51 accettato
+52 accettato
+53 accettato
+54 accettato
+55 accettato
+56 aggiunta
+57 accettato
+58 accettato
+59 aggiunta
+60 camioncino vuoto
 accettato
+61 accettato
+62 rimossa
+63 rifiutato
+64 accettato
+65 rifiutato
+66 accettato
+67 accettato
+68 accettato
+69 ordini in sospeso
+70 accettato
+71 accettato
+72 accettato
+73 accettato
+74 ordini in sospeso
+75 rifiutato
+76 aggiunta
+77 rifiutato
+78 accettato
+79 accettato
+80 camioncino vuoto
 accettato
-accettato
-accettato
-accettato
-accettato
-accettato
-ordini in sospeso
-accettato
-accettato
-accettato
-accettato
-accettato
-accettato
-accettato
-accettato
-accettato
-accettato
-camioncino vuoto
-accettato
-accettato
-accettato
-accettato
-accettato
-accettato
-ordini in sospeso
-accettato
-accettato
-rifiutato
-accettato
-accettato
-accettato
-accettato
-accettato
-accettato
-aggiunta
-accettato
-accettato
-aggiunta
-camioncino vuoto
-accettato
-accettato
-rimossa
-rifiutato
-accettato
-rifiutato
-accettato
-accettato
-accettato
-ordini in sospeso
-accettato
-accettato
-accettato
-accettato
-ordini in sospeso
-rifiutato
-aggiunta
-rifiutato
-accettato
-accettato
-camioncino vuoto
-accettato
-accettato
-accettato
-aggiunta
-accettato
-accettato
-rifornito
-rifiutato
-accettato
-accettato
-accettato
-accettato
-non presente
-accettato
-accettato
-rifiutato
-aggiunta
-accettato
-accettato
-accettato
-27 R1sHSjaN7409HULkW_5iL 30
+81 accettato
+82 accettato
+83 aggiunta
+84 accettato
+85 accettato
+86 rifornito
+87 rifiutato
+88 accettato
+89 accettato
+90 accettato
+91 accettato
+92 non presente
+93 accettato
+94 accettato
+95 rifiutato
+96 aggiunta
+97 accettato
+98 accettato
+99 accettato
+100 27 R1sHSjaN7409HULkW_5iL 30
 31 R1sHSjaN7409HULkW_5iL 30
 55 R1sHSjaN7409HULkW_5iL 30
 70 R1sHSjaN7409HULkW_5iL 30
@@ -143,76 +143,76 @@ accettato
 79 R1sHSjaN7409HULkW_5iL 2
 30 R1sHSjaN7409HULkW_5iL 1
 accettato
-accettato
-accettato
-accettato
-rifiutato
-accettato
-rifiutato
-aggiunta
-accettato
-rifornito
-ordini in sospeso
-accettato
-accettato
-accettato
-accettato
-rifiutato
-accettato
-accettato
-accettato
-accettato
-99 Lwmxfma4Ytxf9WXR 29
+101 accettato
+102 accettato
+103 accettato
+104 rifiutato
+105 accettato
+106 rifiutato
+107 aggiunta
+108 accettato
+109 rifornito
+110 ordini in sospeso
+111 accettato
+112 accettato
+113 accettato
+114 accettato
+115 rifiutato
+116 accettato
+117 accettato
+118 accettato
+119 accettato
+120 99 Lwmxfma4Ytxf9WXR 29
 118 R1sHSjaN7409HULkW_5iL 15
 114 Lwmxfma4Ytxf9WXR 9
 89 Lwmxfma4Ytxf9WXR 8
 100 Lwmxfma4Ytxf9WXR 4
 aggiunta
-accettato
-accettato
-accettato
-accettato
-accettato
-accettato
-ignorato
-accettato
-accettato
-accettato
-accettato
-ordini in sospeso
-accettato
-accettato
-aggiunta
-ordini in sospeso
-accettato
-accettato
-accettato
-121 R1sHSjaN7409HULkW_5iL 25
+121 accettato
+122 accettato
+123 accettato
+124 accettato
+125 accettato
+126 accettato
+127 ignorato
+128 accettato
+129 accettato
+130 accettato
+131 accettato
+132 ordini in sospeso
+133 accettato
+134 accettato
+135 aggiunta
+136 ordini in sospeso
+137 accettato
+138 accettato
+139 accettato
+140 121 R1sHSjaN7409HULkW_5iL 25
 128 R1sHSjaN7409HULkW_5iL 16
 130 Lwmxfma4Ytxf9WXR 14
 129 R1sHSjaN7409HULkW_5iL 12
 133 Lwmxfma4Ytxf9WXR 9
 rifornito
-accettato
-rifornito
-accettato
-accettato
-accettato
-accettato
-accettato
-rifornito
-accettato
-accettato
-accettato
-accettato
-accettato
-ordini in sospeso
-accettato
-accettato
-accettato
-accettato
-accettato
-112 TltfZVeOF 27
+141 accettato
+142 rifornito
+143 accettato
+144 accettato
+145 accettato
+146 accettato
+147 accettato
+148 rifornito
+149 accettato
+150 accettato
+151 accettato
+152 accettato
+153 accettato
+154 ordini in sospeso
+155 accettato
+156 accettato
+157 accettato
+158 accettato
+159 accettato
+160 112 TltfZVeOF 27
 117 TltfZVeOF 13
 84 R1sHSjaN751UVLvuE 4
 124 TltfZVeOF 10
@@ -222,26 +222,26 @@ accettato
 101 R1sHSjaN751UVLvuE 1
 111 TltfZVeOF 1
 rifiutato
-aggiunta
-accettato
-accettato
-accettato
-accettato
-rifiutato
-rifornito
-ordini in sospeso
-accettato
-rifiutato
-rifiutato
-aggiunta
-ordini in sospeso
-accettato
-accettato
-aggiunta
-rifiutato
-ordini in sospeso
-accettato
-116 Lwmxfma4Ytxf9WXR 30
+161 aggiunta
+162 accettato
+163 accettato
+164 accettato
+165 accettato
+166 rifiutato
+167 rifornito
+168 ordini in sospeso
+169 accettato
+170 rifiutato
+171 rifiutato
+172 aggiunta
+173 ordini in sospeso
+174 accettato
+175 accettato
+176 aggiunta
+177 rifiutato
+178 ordini in sospeso
+179 accettato
+180 116 Lwmxfma4Ytxf9WXR 30
 138 Lwmxfma4Ytxf9WXR 28
 103 R1sHSjaN751UVLvuE 6
 137 Lwmxfma4Ytxf9WXR 14
@@ -255,26 +255,26 @@ accettato
 159 TltfZVeOqZICducF9ztS0B6VKTx 17
 113 dV66drdPk 3
 ordini in sospeso
-accettato
-accettato
-accettato
-rifornito
-accettato
-accettato
-accettato
-rifiutato
-rifornito
-accettato
-accettato
-accettato
-aggiunta
-aggiunta
-accettato
-accettato
-accettato
-ordini in sospeso
-accettato
-73 dV66drdPk 14
+181 accettato
+182 accettato
+183 accettato
+184 rifornito
+185 accettato
+186 accettato
+187 accettato
+188 rifiutato
+189 rifornito
+190 accettato
+191 accettato
+192 accettato
+193 aggiunta
+194 aggiunta
+195 accettato
+196 accettato
+197 accettato
+198 ordini in sospeso
+199 accettato
+200 73 dV66drdPk 14
 25 LwmxfmW 25
 36 LwmxfmW 23
 144 dV66drdPk 12
@@ -311,26 +311,26 @@ accettato
 182 TltfZVeOqZICducF9ztS0B6VKTx 4
 108 dV66drddTwFQrbifRjPvWK9jpw 1
 rifornito
-aggiunta
-rifornito
-accettato
-aggiunta
-accettato
-ignorato
-accettato
-rifornito
-accettato
-accettato
-rifornito
-aggiunta
-accettato
-accettato
-accettato
-rifornito
-accettato
-accettato
-ordini in sospeso
-51 LwmxfmW 25
+201 aggiunta
+202 rifornito
+203 accettato
+204 aggiunta
+205 accettato
+206 ignorato
+207 accettato
+208 rifornito
+209 accettato
+210 accettato
+211 rifornito
+212 aggiunta
+213 accettato
+214 accettato
+215 accettato
+216 rifornito
+217 accettato
+218 accettato
+219 ordini in sospeso
+220 51 LwmxfmW 25
 213 LwmxfmW 25
 207 dV66drdRDZg9IU9a0vJ9CsF3 9
 185 t7D7FECZyMsGpDCXD 8
@@ -374,69 +374,65 @@ ordini in sospeso
 215 dV66drdoQ 1
 145 dV66drddTwFQrbifRjPvWK9jpw 1
 accettato
-accettato
-rifornito
-accettato
-accettato
-rimossa
-rimossa
-aggiunta
-rimossa
-accettato
-rifiutato
-aggiunta
-rifornito
-accettato
-accettato
-rifornito
-accettato
-accettato
-accettato
-accettato
-239 TltfZVeOS1BkR 9
+221 accettato
+222 rifornito
+223 accettato
+224 accettato
+225 rimossa
+226 rimossa
+227 aggiunta
+228 rimossa
+229 accettato
+230 rifiutato
+231 aggiunta
+232 rifornito
+233 accettato
+234 accettato
+235 rifornito
+236 accettato
+237 accettato
+238 accettato
+239 accettato
+240 239 TltfZVeOS1BkR 9
 233 LwmxfmW 21
 223 TltfZVeOIzClX0ev3pIWHkTe 17
 220 TltfZVeOS1BkR 7
-237 TltfZVeO1vpPAYzoZhaL_lr8 71
 236 dV66drdRDZg9IU9a0vJ9CsF3 4
 229 t7D7FECZynQlkoDPLJqqlXUbwgC 28
 238 t7D7FECZynQlkoDPLJqqlXUbwgC 16
 221 TltfZVeOS1BkR 1
 accettato
-rifiutato
-aggiunta
-accettato
-accettato
-accettato
-accettato
-accettato
-accettato
-accettato
-rifiutato
-accettato
-ignorato
-accettato
-accettato
-accettato
-accettato
-non presente
-accettato
-accettato
-243 LwmxfmW 14
+241 rifiutato
+242 aggiunta
+243 accettato
+244 accettato
+245 accettato
+246 accettato
+247 accettato
+248 accettato
+249 accettato
+250 rifiutato
+251 accettato
+252 ignorato
+253 accettato
+254 accettato
+255 accettato
+256 accettato
+257 non presente
+258 accettato
+259 accettato
+260 243 LwmxfmW 14
 254 TltfZVeOqZICducF9ztS0B6VKTx 41
-249 TltfZVeOF 14
 244 dV66drdmlQD9fG16Rib 7
 240 TltfZVeOIzClX0ev3pIWHkTe 6
 245 t7D7FECZyMsGpDCXD 2
-256 TltfZVeOIzClX0ev3pIWHkTe 5
-258 TltfZVeOS1BkR 2
 accettato
-accettato
-accettato
-rifornito
-accettato
-rifornito
-accettato
-accettato
-accettato
-accettato
+261 accettato
+262 accettato
+263 rifornito
+264 accettato
+265 rifornito
+266 accettato
+267 accettato
+268 accettato
+269 accettato
