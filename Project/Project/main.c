@@ -542,7 +542,7 @@ ORDER_READY* sort_the_new_order_ready(ORDER_READY* new_order, ORDER_READY* order
 	else {
 		bool sorted = false;
 		while (sorted != true) {
-			
+
 			if (order_ready_tmp->next == NULL) {
 				order_ready_tmp->next = new_order;
 				sorted = true;
@@ -747,13 +747,13 @@ int main() {
 				//chosing the option and considering the delivery
 				if (program_clock != 0 && program_clock % delivery_clock == 0) {
 					//delivery	
-					
+
 					if (order_ready != NULL)
 						order_ready = Load_the_delivery_truck(order_ready, delivery_dim);
 					else
 						printf("camioncino vuoto\n");
 
-					
+
 				}
 
 
@@ -842,15 +842,15 @@ int main() {
 
 
 					if (Find_in_WaitList(wait_list, name) == true)
-						printf("ordini in sospeso \n");
+						printf("ordini in sospeso\n");
 
 					else if (Find_in_order_ready(order_ready, name) == true)
-						printf("ordini in sospeso \n");
+						printf("ordini in sospeso\n");
 
 					else
 					{
-						if (Find_Recipe(recipe_root,name) == false)
-							printf("non presente \n");
+						if (Find_Recipe(recipe_root, name) == false)
+							printf("non presente\n");
 						else
 							recipe_root = Delete_recipe(recipe_root, name);
 					}
@@ -865,37 +865,28 @@ int main() {
 
 				else if (strcmp(key_menu, "rifornimento") == 0)		// rifornimento
 				{
+					char tmp_name[LEN];
 
-					while (buffer[0] != '\n')
+					//ingredient name
+					char* ptr = buffer;
+
+					//bebbo = Chop_word(buffer, tmp_name);
+					while (sscanf(ptr, "%s", tmp_name) > 0) 
 					{
-
-
-						char tmp_name[LEN];
-
-						//ingredient name
-						sscanf(buffer, "%s", tmp_name);
-						bebbo = Chop_word(buffer, tmp_name);
-						if (bebbo == NULL)
-							buffer[0] = '\n';
-						else
-							strcpy(buffer, bebbo);
+						ptr += strlen(tmp_name) + 1;
 
 						ITEM* new_item = (ITEM*)malloc(sizeof(ITEM));
-						sscanf(buffer, "%d %d", &new_item->quantity, &new_item->decay);
+						char p[2][50];
+						sscanf(ptr, "%d %d", &new_item->quantity, &new_item->decay);
+						sscanf(ptr, "%s %s", p[0], p[1]);
+						ptr += strlen(p[0]) + strlen(p[1]) + 2;
+
+
 						new_item->next = NULL;
-
-						bebbo = Chop_two_int(buffer, new_item->quantity, new_item->decay);
-
-						if (bebbo == NULL)
-							buffer[0] = '\n';
-						else
-							strcpy(buffer, bebbo);
-
 
 
 						if (prod_root == NULL) { // if the Prod_tree is empty i create the prod_root
 
-							//prod_root->item = Sort_new_prod_item(prod_root->item, new_item);
 							prod_root = Create_prod_child_node(tmp_name, new_item);
 						}
 						else {
