@@ -835,7 +835,6 @@ int main() {
 					sscanf(buffer, "%s", name);
 					bebbo = Chop_word(buffer, name);
 					//*buffer = Chop_word(buffer, name);
-					strcpy(buffer, bebbo);
 					if (bebbo == NULL)
 						buffer[0] = '\n';
 					else
