@@ -260,7 +260,6 @@ INGREDIENT* Create_new_ingredient(char* name, int quantity) {
 	ing->next = NULL;
 	return ing;
 }
-
 RECIPE_TREE_NODE* Create_recipe_child_node(char* name, INGREDIENT* ingredient) {
 	RECIPE_TREE_NODE* new_node = (RECIPE_TREE_NODE*)malloc(sizeof(RECIPE_TREE_NODE));
 	if (new_node != NULL) {
@@ -536,9 +535,14 @@ ORDER_READY* sort_the_new_order_ready(ORDER_READY* new_order, ORDER_READY* order
 	if (order_ready == NULL) {
 		order_ready = new_order;
 	}
+	else if (order_ready->time > new_order->time) {
+		new_order->next = order_ready;
+		order_ready = new_order;
+	}
 	else {
 		bool sorted = false;
 		while (sorted != true) {
+			
 			if (order_ready_tmp->next == NULL) {
 				order_ready_tmp->next = new_order;
 				sorted = true;
@@ -691,7 +695,12 @@ void Print_recipes(RECIPE_TREE_NODE* father) {
 	if (father->right != NULL)
 		Print_recipes(father->right);
 }
-
+void Print_order_ready(ORDER_READY* order) {
+	while (order != NULL) {
+		printf("%d %s %d\n", order->time, order->name, order->weight);
+		order = order->next;
+	}
+}
 
 int main() {
 
@@ -738,10 +747,13 @@ int main() {
 				//chosing the option and considering the delivery
 				if (program_clock != 0 && program_clock % delivery_clock == 0) {
 					//delivery	
+					
 					if (order_ready != NULL)
 						order_ready = Load_the_delivery_truck(order_ready, delivery_dim);
 					else
 						printf("camioncino vuoto\n");
+
+					
 				}
 
 
