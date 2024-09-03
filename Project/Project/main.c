@@ -22,6 +22,7 @@ typedef struct ing_node {
 typedef struct recipe_tree_node {
 	char name[LEN];
 	INGREDIENT* ingredient;
+	bool is_existing;
 	struct recipe_tree_node* left;
 	struct recipe_tree_node* right;
 }RECIPE_TREE_NODE;
@@ -179,7 +180,7 @@ void Sort_new_prod(PROD_TREE_NODE* prod_root, char* name, ITEM* new_item, int pr
 }
 
 // ============================ RECIPE CHILD CREATION ==================================
-bool Find_Recipe(RECIPE_TREE_NODE* root, char* name) {
+/*bool Find_Recipe(RECIPE_TREE_NODE* root, char* name) {
 
 	while (root != NULL)
 	{
@@ -205,7 +206,7 @@ bool Find_Recipe(RECIPE_TREE_NODE* root, char* name) {
 	}
 	return false;
 }
-
+/*
 bool Sort_new_recipe(RECIPE_TREE_NODE* recipe_root, RECIPE_TREE_NODE* recipe_tmp) {
 
 	RECIPE_TREE_NODE* treenode = recipe_root;
@@ -254,9 +255,83 @@ bool Sort_new_recipe(RECIPE_TREE_NODE* recipe_root, RECIPE_TREE_NODE* recipe_tmp
 		}
 
 	}
-	
+
 	return isPresent;
 }
+*/
+
+void Add_new_recipe(RECIPE_TREE_NODE* recipe_root, RECIPE_TREE_NODE* recipe_tmp) {
+
+	RECIPE_TREE_NODE* treenode = recipe_root;
+	bool isPresent = false;
+	while (true)
+	{
+		if (strcmp(treenode->name, recipe_tmp->name) == 0)
+		{
+			treenode->is_existing = true;
+			treenode->ingredient = recipe_tmp->ingredient;
+			break;// recipe was already existing
+		}
+		else
+		{// recipe_tmp is bigger than treenode
+			if (strcmp(treenode->name, recipe_tmp->name) < 0)
+			{
+				if (treenode->right == NULL)
+				{
+					treenode->right = recipe_tmp;
+					break; // recipe wasn't already existing
+				}
+				else
+					treenode = treenode->right;
+			}
+			else
+			{ // recipe_tmp is smaller than treenode
+
+				if (treenode->left == NULL)
+				{
+					treenode->left = recipe_tmp;
+					break; // recipe wasn't already existing
+				}
+				else
+					treenode = treenode->left;
+
+			}
+
+		}
+
+	}
+
+}
+
+RECIPE_TREE_NODE* Find_Recipe(RECIPE_TREE_NODE* recipe_root, char* name) {
+	if (recipe_root == NULL)
+		return NULL;
+
+	while (true) {
+
+		if (strcmp(recipe_root->name, name) == 0)
+		{
+			return recipe_root;
+		}
+		if (strcmp(name, recipe_root->name) < 0)
+		{
+			if (recipe_root->left == NULL)
+				return NULL;
+			else
+				recipe_root = recipe_root->left;
+		}
+		else
+		{
+			if (recipe_root->right == NULL)
+				return NULL;
+			else
+				recipe_root = recipe_root->right;
+		}
+
+	}
+	return recipe_root;
+}
+
 INGREDIENT* Create_new_ingredient(char* name, int quantity) {
 	INGREDIENT* ing = (INGREDIENT*)malloc(sizeof(INGREDIENT));
 	strcpy(ing->name, name);
@@ -270,6 +345,7 @@ RECIPE_TREE_NODE* Create_recipe_child_node(char* name, INGREDIENT* ingredient) {
 
 		strcpy(new_node->name, name);
 		new_node->ingredient = ingredient;
+		new_node->is_existing = true;
 		new_node->left = NULL;
 		new_node->right = NULL;
 	}
@@ -408,73 +484,39 @@ RECIPE_TREE_NODE* Get_successor(RECIPE_TREE_NODE* curr) {
 	return curr;
 }
 
-RECIPE_TREE_NODE* Delete_recipe(RECIPE_TREE_NODE* root, char* name,int counter) {
+void Delete_recipe(RECIPE_TREE_NODE* root, char* name) {
 
 	if (root == NULL) {
-		//printf("non presente %s\n", root->name);
-		//printf("non presente \n");
-		return NULL;
+		return ;
 	}
 
-	if (strcmp(root->name, name) > 0) {
-		if (root->left != NULL)
-			root->left = Delete_recipe(root->left, name, counter);//##############
-		else {
-			//printf("non presente %s\n", root->name);
-			//printf("non presente\n");
-			return NULL;
-		}
-	}
-	else if (strcmp(root->name, name) < 0) {
-		if (root->right != NULL)
-			root->right = Delete_recipe(root->right, name, counter);//##############
-		else {
-			//printf("non presente %s\n", root->name);
-			//printf("non presente\n");
-			return NULL;
-		}
+	while(true){
+		if (strcmp(name, root->name) == 0)
+		{
+			root->is_existing = false;
 
-	}
-	else {// found the node that need to be deleated
-		
-		if (counter == 0) {
 			while (root->ingredient != NULL) {
-				INGREDIENT* ing_tmp = root->ingredient;
+				INGREDIENT* tmp = root->ingredient;
 				root->ingredient = root->ingredient->next;
-				My_free(ing_tmp);
+				My_free(tmp);
 			}
-			counter = 1;
-			root->ingredient = NULL;
-		}
-
-
-		if (root->left == NULL) { // case 1: no child or only RIGHT child
-			//printf("rimossa %s\n", root->name);
 			printf("rimossa\n");
-			
-			RECIPE_TREE_NODE* tmp = root->right;
-			My_free(root);
-			return tmp;
-
+			return;
 		}
-
-		if (root->right == NULL) { // case 2: one child [LEFT]
-			//printf("rimossa %s\n", root->name);
-			printf("rimossa\n");
-			RECIPE_TREE_NODE* tmp = root->left;
-			My_free(root);
-			return tmp;
-
+		else if (strcmp(name, root->name) < 0)
+		{
+			if (root->left == NULL)
+				return;
+			else
+				root = root->left;
 		}
-		// case 3: two child 
-		RECIPE_TREE_NODE* succ = Get_successor(root);
-		strcpy(root->name, succ->name);
-		root->ingredient = succ->ingredient;
-		root->right = Delete_recipe(root->right, succ->name,1);
-
-
+		else
+			if (root->right == NULL)
+				return;
+			else
+				root = root->right;
 	}
-	return root;
+	return;
 }
 
 // =============================== ORDER'S PREPARATION====================================
@@ -739,13 +781,16 @@ int main() {
 	char buffer[BLEN];
 	//freopen("input.txt", "r", stdin);
 	//freopen("output.txt", "w", stdout);
+
+	//int program_clock = 2; //id the debugger clock
+	int program_clock = 0; // is the real clock
+
 	if (fgets(buffer, BLEN, stdin) == NULL)
 		return 0;
 	if (sscanf(buffer, "%d %d", &delivery_clock, &delivery_dim) != 0)
 	{
 
-		//int program_clock = 2; //id the debugger clock
-		int program_clock = 0; // is the real clock
+		
 
 
 		char name[LEN];
@@ -785,48 +830,49 @@ int main() {
 				char ing_name[LEN];
 				int quantity;
 				char p[30];
-
-				while (sscanf(my_ptr, "%s %s", ing_name, p) > 0) {
-
-					sscanf(p, "%d", &quantity);
-
-					my_ptr += strlen(ing_name) + strlen(p) + 2;
-
-					// creting a temporary recipe
-					INGREDIENT* new_ing = Create_new_ingredient(ing_name, quantity);
-					if (ing == NULL) {
-						ing = new_ing;
-					}
-					else {
-						new_ing->next = ing;
-						ing = new_ing;
-					}
-
+				RECIPE_TREE_NODE* node_found = Find_Recipe(recipe_root, name);
+				if (node_found != NULL && node_found->is_existing == true)
+				{
+					
+						printf("ignorato\n");
+						//continue;
+					
+					
 				}
+				else{
 
-				RECIPE_TREE_NODE* recipe_tmp = Create_recipe_child_node(name, ing);
+					while (sscanf(my_ptr, "%s %s", ing_name, p) > 0) {
+
+						sscanf(p, "%d", &quantity);
+
+						my_ptr += strlen(ing_name) + strlen(p) + 2;
+
+						// creting a temporary recipe
+						INGREDIENT* new_ing = Create_new_ingredient(ing_name, quantity);
+						if (ing == NULL) {
+							ing = new_ing;
+						}
+						else {
+							new_ing->next = ing;
+							ing = new_ing;
+						}
+
+					}
+
+					RECIPE_TREE_NODE* recipe_tmp = Create_recipe_child_node(name, ing);
 
 
-				if (recipe_root == NULL) {
-					recipe_root = recipe_tmp;
+					if (recipe_root == NULL)
+						recipe_root = recipe_tmp;
+					else
+						Add_new_recipe(recipe_root, recipe_tmp);
+
 					printf("aggiunta\n");
 				}
-				else {
-
-					bool is_already_existing = Sort_new_recipe(recipe_root, recipe_tmp);
-
-					if (is_already_existing == true) {
-						printf("ignorato\n");
-					}
-					else {
-						printf("aggiunta\n");
-					}
-				}
-
 			}
 			else if (strcmp(key_menu, "rimuovi_ricetta") == 0)	// rimuovi ricetta
 			{
-				
+
 
 				sscanf(my_ptr, "%s", name);
 
@@ -840,10 +886,13 @@ int main() {
 
 				else
 				{
-					if (Find_Recipe(recipe_root, name) == false)
+					RECIPE_TREE_NODE* recipe_found = Find_Recipe(recipe_root, name);
+					if (recipe_found == NULL)
+						printf("non presente\n");
+					else if (recipe_found->is_existing == false)
 						printf("non presente\n");
 					else
-						recipe_root = Delete_recipe(recipe_root, name,0);
+						Delete_recipe(recipe_root, name);
 				}
 
 			}
@@ -947,7 +996,7 @@ int main() {
 
 
 				order_pointers->recipe = Check_recipe_for_order(recipe_root, name);
-				if (order_pointers->recipe != NULL)
+				if (order_pointers->recipe != NULL && order_pointers->recipe->is_existing == true)
 				{
 					order_pointers->prod_pointer = Check_ing_for_order(program_clock, order_pointers->recipe->ingredient, prod_root, number, program_clock);
 
@@ -996,8 +1045,22 @@ int main() {
 
 		}
 
+		
 
 	}
+
+	if (program_clock != 0 && program_clock % delivery_clock == 0) {
+		//delivery	
+
+		if (order_ready != NULL)
+			order_ready = Load_the_delivery_truck(order_ready, delivery_dim);
+		else
+			printf("camioncino vuoto\n");
+
+
+	}
+
+
 
 	//rilascio tutti i prodotti
 	prod_root_trash_can(prod_root);
